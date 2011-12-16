@@ -24,6 +24,7 @@
 #include "timestamp.h"
 #include "control_board.h"
 #include "error_message.h"
+#include "program_info.h"
 
 cwiid_mesg_callback_t cwiid_callback;
 

@@ -33,17 +33,10 @@ CPP_OBJS =$(CPP_SRC:%.cpp=%.o)
 DEPS = $(OBJS:%.o=%.d) \
 	   $(CPP_OBJS:%.o=%.d)
 LIB_FLAGS = $(LIBS:%=-l%) \
-			$(PROJ_LIBS:%=-L../%/) \
-			$(PROJ_LIBS:%=-l%) \
-			$(PROJ_SHARED_LIBS:%=-L../%/) \
-			$(PROJ_SHARED_LIBS:%=-l%)
+			$(LIB_DIR:%=-L../%/) 
 EXTRA_CFLAGS+= $(PROJ_LIBS:%=-I../%/) 
-EXTRA_CFLAGS+= $(PROJ_SHARED_LIBS:%=-I../%/)
 EXTRA_CFLAGS+= $(PACKAGES:%=-I%)
 EXT_DEPS+=$(PACKAGE_MAKEFILES)
-EXT_DEPS+=$(join $(PROJ_LIBS:%=../%/),$(PROJ_LIBS:%=lib%.a))
-EXT_DEPS+=$(join $(PROJ_SHARED_LIBS:%=../%/),$(PROJ_SHARED_LIBS:%=lib%.so.1))
-LDFLAGS+=$(LINK:%=-T%)
 CFLAGS+=$(DEBUG:%=-g%)
 LDFLAGS+=$(DEBUG:%=-g%)
 CFLAGS+=$(OPT:%=-O%)
@@ -68,7 +61,6 @@ $(HEXFILE_NAME): $(EXECUTABLE_NAME)
 	$(OBJCOPY) $(OBJCOPY_FLAGS) $(EXECUTABLE_NAME) $(HEXFILE_NAME)
 
 $(EXECUTABLE_NAME): $(OBJS) $(CPP_OBJS) $(EXT_DEPS)
-	@echo Package makefiles: $(PACKAGE_MAKEFILES)
 	@echo 
 	@echo Linking $(EXECUTABLE_NAME)
 	$(CXX) -o $(EXECUTABLE_NAME) $(LDFLAGS) $(EXTRA_LDFLAGS) $(OBJS) $(CPP_OBJS) $(ASMS) $(LIB_FLAGS)
@@ -99,8 +91,8 @@ $(LIBD_NAME): $(OBJS) $(CPP_OBJS) $(EXT_DEPS)
 $(CPP_OBJS): %.o : %.cpp $(MAKEFILES)
 	@echo
 	@echo Compiling $*.cpp
-	$(CXX) -c $(CXXFLAGS) $(EXTRA_CXXFLAGS) -D__GCC__=\"$(CXX)\" $< -o $@
-	$(CXX) -MM $(CXXFLAGS) $(EXTRA_CXXFLAGS) -D__GCC__=\"$(CXX)\" $*.cpp > $*.d
+	$(CXX) -c $(CXXFLAGS) $(EXTRA_CXXFLAGS) $< -o $@
+	$(CXX) -MM $(CXXFLAGS) $(EXTRA_CXXFLAGS) $*.cpp > $*.d
 	@mv -f $*.d $*.d.tmp
 	@sed -e 's|.*:|$*.o:|' < $*.d.tmp > $*.d
 	@rm -f $*.d.tmp
@@ -108,8 +100,8 @@ $(CPP_OBJS): %.o : %.cpp $(MAKEFILES)
 $(OBJS): %.o : %.c $(MAKEFILES)
 	@echo
 	@echo Compiling $*.c
-	$(CC) -c $(CFLAGS) $(EXTRA_CFLAGS) -D__GCC__=\"$(CC)\" $< -o $@
-	$(CC) -MM $(CFLAGS) $(EXTRA_CFLAGS) -D__GCC__=\"$(CC)\" $*.c > $*.d
+	$(CC) -c $(CFLAGS) $(EXTRA_CFLAGS) $< -o $@
+	$(CC) -MM $(CFLAGS) $(EXTRA_CFLAGS) $*.c > $*.d
 	@mv -f $*.d $*.d.tmp
 	@sed -e 's|.*:|$*.o:|' < $*.d.tmp > $*.d
 	@rm -f $*.d.tmp
