@@ -18,6 +18,12 @@ typedef struct window_ref_t
 	GtkTextView *program_info_control;
 	GtkRange* left_motor_slide;
 	GtkRange* right_motor_slide;
+	GtkLabel* left_motor_min_label;
+	GtkLabel* left_motor_null_label;
+	GtkLabel* left_motor_max_label;
+	GtkLabel* right_motor_min_label;
+	GtkLabel* right_motor_null_label;
+	GtkLabel* right_motor_max_label;
 	GtkSpinButton* left_motor_control;
 	GtkSpinButton* right_motor_control;
 	GtkTextView *sensor_value_control;

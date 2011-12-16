@@ -331,6 +331,15 @@ window_ref_t *init_gui(int argc, char *argv[])
 					"left_motor_slide"));
 	wm.left_motor_control = GTK_SPIN_BUTTON(gtk_builder_get_object(builder,
 					"left_motor_value"));
+
+	wm.left_motor_min_label = GTK_LABEL(gtk_builder_get_object(builder, "left_motor_min_label"));
+	wm.left_motor_null_label = GTK_LABEL(gtk_builder_get_object(builder, "left_motor_null_label"));
+	wm.left_motor_max_label = GTK_LABEL(gtk_builder_get_object(builder, "left_motor_max_label"));
+
+	wm.right_motor_min_label = GTK_LABEL(gtk_builder_get_object(builder, "right_motor_min_label"));
+	wm.right_motor_null_label = GTK_LABEL(gtk_builder_get_object(builder, "right_motor_null_label"));
+	wm.right_motor_max_label = GTK_LABEL(gtk_builder_get_object(builder, "right_motor_max_label"));
+
 	wm.right_motor_slide = GTK_RANGE(gtk_builder_get_object(builder,
 					"right_motor_slide"));
 	wm.right_motor_control = GTK_SPIN_BUTTON(gtk_builder_get_object(builder,
@@ -366,8 +375,8 @@ window_ref_t *init_gui(int argc, char *argv[])
 #endif
 
 #if !LCD_SUPPORTED
-	gtk_widget_set_sensitive(GTK_WIDGET(wm.lcd_text), false);
-	gtk_widget_set_sensitive(GTK_WIDGET(wm.clear_lcd_button), false);
+//	gtk_widget_set_sensitive(GTK_WIDGET(wm.lcd_text), false);
+//	gtk_widget_set_sensitive(GTK_WIDGET(wm.clear_lcd_button), false);
 #endif
 
 	wm.lcd_text = GTK_TEXT_VIEW(gtk_builder_get_object(builder,
@@ -402,6 +411,26 @@ window_ref_t *init_gui(int argc, char *argv[])
 			MAX_FORWARD_SPEED);
 	gtk_spin_button_set_range(wm.right_motor_control, MIN_DIRECTION_MOTOR,
 			MAX_DIRECTION_MOTOR);
+
+	char label_string[32] = "";
+
+	sprintf(label_string, "%d",MIN_DIRECTION_MOTOR);
+	gtk_label_set_text(GTK_LABEL(wm.right_motor_min_label), label_string);
+
+	sprintf(label_string, "%d",DIRECTION_NULL_VALUE);
+	gtk_label_set_text(GTK_LABEL(wm.right_motor_null_label), label_string);
+
+	sprintf(label_string, "%d",MAX_DIRECTION_MOTOR);
+	gtk_label_set_text(GTK_LABEL(wm.right_motor_max_label), label_string);
+
+	sprintf(label_string, "%d",MAX_REVERSE_SPEED);
+	gtk_label_set_text(GTK_LABEL(wm.left_motor_min_label), label_string);
+
+	sprintf(label_string, "%d",SPEED_NULL_VALUE);
+	gtk_label_set_text(GTK_LABEL(wm.left_motor_null_label), label_string);
+
+	sprintf(label_string, "%d",MAX_FORWARD_SPEED);
+	gtk_label_set_text(GTK_LABEL(wm.right_motor_max_label), label_string);
 
 	gtk_spin_button_set_range(wm.motor_timeout_control, -1, 65535);
 	gtk_spin_button_set_value(wm.motor_timeout_control, 200);

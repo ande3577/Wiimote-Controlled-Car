@@ -201,7 +201,7 @@ Test Application</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <child>
-                                      <object class="GtkLabel" id="label9">
+                                      <object class="GtkLabel" id="left_motor_max_label">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="label" translatable="yes">256</property>
@@ -213,7 +213,7 @@ Test Application</property>
                                       </packing>
                                     </child>
                                     <child>
-                                      <object class="GtkLabel" id="label10">
+                                      <object class="GtkLabel" id="left_motor_null_label">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="label" translatable="yes">0</property>
@@ -225,7 +225,7 @@ Test Application</property>
                                       </packing>
                                     </child>
                                     <child>
-                                      <object class="GtkLabel" id="label11">
+                                      <object class="GtkLabel" id="left_motor_min_label">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="label" translatable="yes">-256</property>
@@ -348,7 +348,7 @@ Test Application</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <child>
-                                      <object class="GtkLabel" id="label12">
+                                      <object class="GtkLabel" id="right_motor_max_label">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="label" translatable="yes">256</property>
@@ -360,7 +360,7 @@ Test Application</property>
                                       </packing>
                                     </child>
                                     <child>
-                                      <object class="GtkLabel" id="label13">
+                                      <object class="GtkLabel" id="right_motor_null_label">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="label" translatable="yes">0</property>
@@ -372,7 +372,7 @@ Test Application</property>
                                       </packing>
                                     </child>
                                     <child>
-                                      <object class="GtkLabel" id="label14">
+                                      <object class="GtkLabel" id="right_motor_min_label">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="label" translatable="yes">-256</property>
