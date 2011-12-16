@@ -1,0 +1,1 @@
+rfcomm connect hci0 06:1B:08:08:38:0F 1

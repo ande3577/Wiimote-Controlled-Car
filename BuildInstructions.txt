@@ -1,0 +1,10 @@
+Project must be located at:
+	SDK/+cs_uClibc-0.9.30.1/package/cwiimotecar
+
+Libcwiid files must have been manually copied to:
+	SDK/staging_dir/target-mipsel_uClibc-0.9.30.1/usr/lib
+
+To download into router:
+	cd to SDK/bin/brcm47xx/packages
+	ssh into router: ssh root@192.168.1.1
+	install package: ipkg install cwiimotecar_1_brcm47xx.ipk
