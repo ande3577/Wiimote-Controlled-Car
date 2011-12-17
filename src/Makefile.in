@@ -14,7 +14,6 @@
 # PARTICULAR PURPOSE.
 
 @SET_MAKE@
-
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
@@ -35,14 +34,16 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-bin_PROGRAMS = wiimotecarapp$(EXEEXT)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/configure AUTHORS COPYING \
 	ChangeLog INSTALL NEWS compile config.guess config.sub depcomp \
 	install-sh ltmain.sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
+	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
+	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
@@ -50,35 +51,23 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
 mkinstalldirs = $(install_sh) -d
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-am__installdirs = "$(DESTDIR)$(bindir)"
-PROGRAMS = $(bin_PROGRAMS)
-am__dirstamp = $(am__leading_dot)dirstamp
-am_wiimotecarapp_OBJECTS =  \
-	wiicarutility/wiimotecarapp-error_message.$(OBJEXT) \
-	wiicarutility/wiimotecarapp-timestamp.$(OBJEXT) \
-	wiicarutility/wiimotecarapp-utility.$(OBJEXT) \
-	controlboard/wiimotecarapp-comm.$(OBJEXT) \
-	controlboard/wiimotecarapp-command.$(OBJEXT) \
-	wiimotecar/wiimotecarapp-ControlTasks.$(OBJEXT) \
-	wiimotecar/wiimotecarapp-main.$(OBJEXT) \
-	wiimotecar/wiimotecarapp-wiicar_math.$(OBJEXT) \
-	wiimotecar/wiimotecarapp-WiiMotor.$(OBJEXT)
-wiimotecarapp_OBJECTS = $(am_wiimotecarapp_OBJECTS)
-wiimotecarapp_LDADD = $(LDADD)
-wiimotecarapp_LINK = $(CCLD) $(wiimotecarapp_CFLAGS) $(CFLAGS) \
-	$(wiimotecarapp_LDFLAGS) $(LDFLAGS) -o $@
-DEFAULT_INCLUDES = -I.@am__isrc@
-depcomp = $(SHELL) $(top_srcdir)/depcomp
-am__depfiles_maybe = depfiles
-am__mv = mv -f
-COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-CCLD = $(CC)
-LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(wiimotecarapp_SOURCES)
-DIST_SOURCES = $(wiimotecarapp_SOURCES)
+SOURCES =
+DIST_SOURCES =
+RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
+	html-recursive info-recursive install-data-recursive \
+	install-dvi-recursive install-exec-recursive \
+	install-html-recursive install-info-recursive \
+	install-pdf-recursive install-ps-recursive install-recursive \
+	installcheck-recursive installdirs-recursive pdf-recursive \
+	ps-recursive uninstall-recursive
+RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
+  distclean-recursive maintainer-clean-recursive
+AM_RECURSIVE_TARGETS = $(RECURSIVE_TARGETS:-recursive=) \
+	$(RECURSIVE_CLEAN_TARGETS:-recursive=) tags TAGS ctags CTAGS \
+	distdir dist dist-all distcheck
 ETAGS = etags
 CTAGS = ctags
+DIST_SUBDIRS = $(SUBDIRS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -86,12 +75,38 @@ am__remove_distdir = \
   { test ! -d "$(distdir)" \
     || { find "$(distdir)" -type d ! -perm -200 -exec chmod u+w {} ';' \
          && rm -fr "$(distdir)"; }; }
+am__relativize = \
+  dir0=`pwd`; \
+  sed_first='s,^\([^/]*\)/.*$$,\1,'; \
+  sed_rest='s,^[^/]*/*,,'; \
+  sed_last='s,^.*/\([^/]*\)$$,\1,'; \
+  sed_butlast='s,/*[^/]*$$,,'; \
+  while test -n "$$dir1"; do \
+    first=`echo "$$dir1" | sed -e "$$sed_first"`; \
+    if test "$$first" != "."; then \
+      if test "$$first" = ".."; then \
+        dir2=`echo "$$dir0" | sed -e "$$sed_last"`/"$$dir2"; \
+        dir0=`echo "$$dir0" | sed -e "$$sed_butlast"`; \
+      else \
+        first2=`echo "$$dir2" | sed -e "$$sed_first"`; \
+        if test "$$first2" = "$$first"; then \
+          dir2=`echo "$$dir2" | sed -e "$$sed_rest"`; \
+        else \
+          dir2="../$$dir2"; \
+        fi; \
+        dir0="$$dir0"/"$$first"; \
+      fi; \
+    fi; \
+    dir1=`echo "$$dir1" | sed -e "$$sed_rest"`; \
+  done; \
+  reldir="$$dir2"
 DIST_ARCHIVES = $(distdir).tar.gz
 GZIP_ENV = --best
 distuninstallcheck_listfiles = find . -type f -print
 distcleancheck_listfiles = find . -type f -print
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
+AR = @AR@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -99,26 +114,45 @@ AWK = @AWK@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
+CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
+CXX = @CXX@
+CXXCPP = @CXXCPP@
+CXXDEPMODE = @CXXDEPMODE@
+CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DSYMUTIL = @DSYMUTIL@
+DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
+EGREP = @EGREP@
 EXEEXT = @EXEEXT@
+FGREP = @FGREP@
+GREP = @GREP@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
+LIBTOOL = @LIBTOOL@
+LIPO = @LIPO@
+LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
+NM = @NM@
+NMEDIT = @NMEDIT@
+OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
+OTOOL = @OTOOL@
+OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -127,6 +161,8 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+RANLIB = @RANLIB@
+SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -136,6 +172,8 @@ abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
 ac_ct_CC = @ac_ct_CC@
+ac_ct_CXX = @ac_ct_CXX@
+ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
@@ -166,6 +204,7 @@ libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
 localstatedir = @localstatedir@
+lt_ECHO = @lt_ECHO@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
@@ -185,19 +224,12 @@ target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+SUBDIRS = wiicarutility controlboard wiimotecar
 AUTOMAKE_OPTIONS = subdir-objects
-ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
-wiimotecarapp_SOURCES = wiicarutility/error_message.c \
-	wiicarutility/timestamp.c wiicarutility/utility.c \
-	controlboard/comm.c controlboard/command.c \
-	wiimotecar/ControlTasks.c wiimotecar/main.c \
-	wiimotecar/wiicar_math.c wiimotecar/WiiMotor.c
-wiimotecarapp_CFLAGS = -Iwiicarutility -Icontrolboard -g2 -O0
-wiimotecarapp_LDFLAGS = -lm -lcwiid
-all: all-am
+ACLOCAL_AMFLAGS = -I m4
+all: all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .c .o .obj
 am--refresh:
 	@:
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -232,257 +264,85 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	$(am__cd) $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 $(am__aclocal_m4_deps):
-install-binPROGRAMS: $(bin_PROGRAMS)
-	@$(NORMAL_INSTALL)
-	test -z "$(bindir)" || $(MKDIR_P) "$(DESTDIR)$(bindir)"
-	@list='$(bin_PROGRAMS)'; test -n "$(bindir)" || list=; \
-	for p in $$list; do echo "$$p $$p"; done | \
-	sed 's/$(EXEEXT)$$//' | \
-	while read p p1; do if test -f $$p; \
-	  then echo "$$p"; echo "$$p"; else :; fi; \
-	done | \
-	sed -e 'p;s,.*/,,;n;h' -e 's|.*|.|' \
-	    -e 'p;x;s,.*/,,;s/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/' | \
-	sed 'N;N;N;s,\n, ,g' | \
-	$(AWK) 'BEGIN { files["."] = ""; dirs["."] = 1 } \
-	  { d=$$3; if (dirs[d] != 1) { print "d", d; dirs[d] = 1 } \
-	    if ($$2 == $$4) files[d] = files[d] " " $$1; \
-	    else { print "f", $$3 "/" $$4, $$1; } } \
-	  END { for (d in files) print "f", d, files[d] }' | \
-	while read type dir files; do \
-	    if test "$$dir" = .; then dir=; else dir=/$$dir; fi; \
-	    test -z "$$files" || { \
-	      echo " $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$files '$(DESTDIR)$(bindir)$$dir'"; \
-	      $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$files "$(DESTDIR)$(bindir)$$dir" || exit $$?; \
-	    } \
-	; done
 
-uninstall-binPROGRAMS:
-	@$(NORMAL_UNINSTALL)
-	@list='$(bin_PROGRAMS)'; test -n "$(bindir)" || list=; \
-	files=`for p in $$list; do echo "$$p"; done | \
-	  sed -e 'h;s,^.*/,,;s/$(EXEEXT)$$//;$(transform)' \
-	      -e 's/$$/$(EXEEXT)/' `; \
-	test -n "$$list" || exit 0; \
-	echo " ( cd '$(DESTDIR)$(bindir)' && rm -f" $$files ")"; \
-	cd "$(DESTDIR)$(bindir)" && rm -f $$files
+mostlyclean-libtool:
+	-rm -f *.lo
 
-clean-binPROGRAMS:
-	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
-wiicarutility/$(am__dirstamp):
-	@$(MKDIR_P) wiicarutility
-	@: > wiicarutility/$(am__dirstamp)
-wiicarutility/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) wiicarutility/$(DEPDIR)
-	@: > wiicarutility/$(DEPDIR)/$(am__dirstamp)
-wiicarutility/wiimotecarapp-error_message.$(OBJEXT):  \
-	wiicarutility/$(am__dirstamp) \
-	wiicarutility/$(DEPDIR)/$(am__dirstamp)
-wiicarutility/wiimotecarapp-timestamp.$(OBJEXT):  \
-	wiicarutility/$(am__dirstamp) \
-	wiicarutility/$(DEPDIR)/$(am__dirstamp)
-wiicarutility/wiimotecarapp-utility.$(OBJEXT):  \
-	wiicarutility/$(am__dirstamp) \
-	wiicarutility/$(DEPDIR)/$(am__dirstamp)
-controlboard/$(am__dirstamp):
-	@$(MKDIR_P) controlboard
-	@: > controlboard/$(am__dirstamp)
-controlboard/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) controlboard/$(DEPDIR)
-	@: > controlboard/$(DEPDIR)/$(am__dirstamp)
-controlboard/wiimotecarapp-comm.$(OBJEXT):  \
-	controlboard/$(am__dirstamp) \
-	controlboard/$(DEPDIR)/$(am__dirstamp)
-controlboard/wiimotecarapp-command.$(OBJEXT):  \
-	controlboard/$(am__dirstamp) \
-	controlboard/$(DEPDIR)/$(am__dirstamp)
-wiimotecar/$(am__dirstamp):
-	@$(MKDIR_P) wiimotecar
-	@: > wiimotecar/$(am__dirstamp)
-wiimotecar/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) wiimotecar/$(DEPDIR)
-	@: > wiimotecar/$(DEPDIR)/$(am__dirstamp)
-wiimotecar/wiimotecarapp-ControlTasks.$(OBJEXT):  \
-	wiimotecar/$(am__dirstamp) \
-	wiimotecar/$(DEPDIR)/$(am__dirstamp)
-wiimotecar/wiimotecarapp-main.$(OBJEXT): wiimotecar/$(am__dirstamp) \
-	wiimotecar/$(DEPDIR)/$(am__dirstamp)
-wiimotecar/wiimotecarapp-wiicar_math.$(OBJEXT):  \
-	wiimotecar/$(am__dirstamp) \
-	wiimotecar/$(DEPDIR)/$(am__dirstamp)
-wiimotecar/wiimotecarapp-WiiMotor.$(OBJEXT):  \
-	wiimotecar/$(am__dirstamp) \
-	wiimotecar/$(DEPDIR)/$(am__dirstamp)
-wiimotecarapp$(EXEEXT): $(wiimotecarapp_OBJECTS) $(wiimotecarapp_DEPENDENCIES) 
-	@rm -f wiimotecarapp$(EXEEXT)
-	$(wiimotecarapp_LINK) $(wiimotecarapp_OBJECTS) $(wiimotecarapp_LDADD) $(LIBS)
+clean-libtool:
+	-rm -rf .libs _libs
 
-mostlyclean-compile:
-	-rm -f *.$(OBJEXT)
-	-rm -f controlboard/wiimotecarapp-comm.$(OBJEXT)
-	-rm -f controlboard/wiimotecarapp-command.$(OBJEXT)
-	-rm -f wiicarutility/wiimotecarapp-error_message.$(OBJEXT)
-	-rm -f wiicarutility/wiimotecarapp-timestamp.$(OBJEXT)
-	-rm -f wiicarutility/wiimotecarapp-utility.$(OBJEXT)
-	-rm -f wiimotecar/wiimotecarapp-ControlTasks.$(OBJEXT)
-	-rm -f wiimotecar/wiimotecarapp-WiiMotor.$(OBJEXT)
-	-rm -f wiimotecar/wiimotecarapp-main.$(OBJEXT)
-	-rm -f wiimotecar/wiimotecarapp-wiicar_math.$(OBJEXT)
+distclean-libtool:
+	-rm -f libtool config.lt
 
-distclean-compile:
-	-rm -f *.tab.c
+# This directory's subdirectories are mostly independent; you can cd
+# into them and run `make' without going through this Makefile.
+# To change the values of `make' variables: instead of editing Makefiles,
+# (1) if the variable is set in `config.status', edit `config.status'
+#     (which will cause the Makefiles to be regenerated when you run `make');
+# (2) otherwise, pass the desired values on the `make' command line.
+$(RECURSIVE_TARGETS):
+	@fail= failcom='exit 1'; \
+	for f in x $$MAKEFLAGS; do \
+	  case $$f in \
+	    *=* | --[!k]*);; \
+	    *k*) failcom='fail=yes';; \
+	  esac; \
+	done; \
+	dot_seen=no; \
+	target=`echo $@ | sed s/-recursive//`; \
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	  echo "Making $$target in $$subdir"; \
+	  if test "$$subdir" = "."; then \
+	    dot_seen=yes; \
+	    local_target="$$target-am"; \
+	  else \
+	    local_target="$$target"; \
+	  fi; \
+	  ($(am__cd) $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
+	  || eval $$failcom; \
+	done; \
+	if test "$$dot_seen" = "no"; then \
+	  $(MAKE) $(AM_MAKEFLAGS) "$$target-am" || exit 1; \
+	fi; test -z "$$fail"
 
-@AMDEP_TRUE@@am__include@ @am__quote@controlboard/$(DEPDIR)/wiimotecarapp-comm.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@controlboard/$(DEPDIR)/wiimotecarapp-command.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@wiicarutility/$(DEPDIR)/wiimotecarapp-error_message.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@wiicarutility/$(DEPDIR)/wiimotecarapp-timestamp.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@wiicarutility/$(DEPDIR)/wiimotecarapp-utility.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@wiimotecar/$(DEPDIR)/wiimotecarapp-ControlTasks.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@wiimotecar/$(DEPDIR)/wiimotecarapp-WiiMotor.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@wiimotecar/$(DEPDIR)/wiimotecarapp-main.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@wiimotecar/$(DEPDIR)/wiimotecarapp-wiicar_math.Po@am__quote@
-
-.c.o:
-@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
-@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
-@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c -o $@ $<
-
-.c.obj:
-@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
-@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
-@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
-
-wiicarutility/wiimotecarapp-error_message.o: wiicarutility/error_message.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -MT wiicarutility/wiimotecarapp-error_message.o -MD -MP -MF wiicarutility/$(DEPDIR)/wiimotecarapp-error_message.Tpo -c -o wiicarutility/wiimotecarapp-error_message.o `test -f 'wiicarutility/error_message.c' || echo '$(srcdir)/'`wiicarutility/error_message.c
-@am__fastdepCC_TRUE@	$(am__mv) wiicarutility/$(DEPDIR)/wiimotecarapp-error_message.Tpo wiicarutility/$(DEPDIR)/wiimotecarapp-error_message.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='wiicarutility/error_message.c' object='wiicarutility/wiimotecarapp-error_message.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -c -o wiicarutility/wiimotecarapp-error_message.o `test -f 'wiicarutility/error_message.c' || echo '$(srcdir)/'`wiicarutility/error_message.c
-
-wiicarutility/wiimotecarapp-error_message.obj: wiicarutility/error_message.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -MT wiicarutility/wiimotecarapp-error_message.obj -MD -MP -MF wiicarutility/$(DEPDIR)/wiimotecarapp-error_message.Tpo -c -o wiicarutility/wiimotecarapp-error_message.obj `if test -f 'wiicarutility/error_message.c'; then $(CYGPATH_W) 'wiicarutility/error_message.c'; else $(CYGPATH_W) '$(srcdir)/wiicarutility/error_message.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) wiicarutility/$(DEPDIR)/wiimotecarapp-error_message.Tpo wiicarutility/$(DEPDIR)/wiimotecarapp-error_message.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='wiicarutility/error_message.c' object='wiicarutility/wiimotecarapp-error_message.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -c -o wiicarutility/wiimotecarapp-error_message.obj `if test -f 'wiicarutility/error_message.c'; then $(CYGPATH_W) 'wiicarutility/error_message.c'; else $(CYGPATH_W) '$(srcdir)/wiicarutility/error_message.c'; fi`
-
-wiicarutility/wiimotecarapp-timestamp.o: wiicarutility/timestamp.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -MT wiicarutility/wiimotecarapp-timestamp.o -MD -MP -MF wiicarutility/$(DEPDIR)/wiimotecarapp-timestamp.Tpo -c -o wiicarutility/wiimotecarapp-timestamp.o `test -f 'wiicarutility/timestamp.c' || echo '$(srcdir)/'`wiicarutility/timestamp.c
-@am__fastdepCC_TRUE@	$(am__mv) wiicarutility/$(DEPDIR)/wiimotecarapp-timestamp.Tpo wiicarutility/$(DEPDIR)/wiimotecarapp-timestamp.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='wiicarutility/timestamp.c' object='wiicarutility/wiimotecarapp-timestamp.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -c -o wiicarutility/wiimotecarapp-timestamp.o `test -f 'wiicarutility/timestamp.c' || echo '$(srcdir)/'`wiicarutility/timestamp.c
-
-wiicarutility/wiimotecarapp-timestamp.obj: wiicarutility/timestamp.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -MT wiicarutility/wiimotecarapp-timestamp.obj -MD -MP -MF wiicarutility/$(DEPDIR)/wiimotecarapp-timestamp.Tpo -c -o wiicarutility/wiimotecarapp-timestamp.obj `if test -f 'wiicarutility/timestamp.c'; then $(CYGPATH_W) 'wiicarutility/timestamp.c'; else $(CYGPATH_W) '$(srcdir)/wiicarutility/timestamp.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) wiicarutility/$(DEPDIR)/wiimotecarapp-timestamp.Tpo wiicarutility/$(DEPDIR)/wiimotecarapp-timestamp.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='wiicarutility/timestamp.c' object='wiicarutility/wiimotecarapp-timestamp.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -c -o wiicarutility/wiimotecarapp-timestamp.obj `if test -f 'wiicarutility/timestamp.c'; then $(CYGPATH_W) 'wiicarutility/timestamp.c'; else $(CYGPATH_W) '$(srcdir)/wiicarutility/timestamp.c'; fi`
-
-wiicarutility/wiimotecarapp-utility.o: wiicarutility/utility.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -MT wiicarutility/wiimotecarapp-utility.o -MD -MP -MF wiicarutility/$(DEPDIR)/wiimotecarapp-utility.Tpo -c -o wiicarutility/wiimotecarapp-utility.o `test -f 'wiicarutility/utility.c' || echo '$(srcdir)/'`wiicarutility/utility.c
-@am__fastdepCC_TRUE@	$(am__mv) wiicarutility/$(DEPDIR)/wiimotecarapp-utility.Tpo wiicarutility/$(DEPDIR)/wiimotecarapp-utility.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='wiicarutility/utility.c' object='wiicarutility/wiimotecarapp-utility.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -c -o wiicarutility/wiimotecarapp-utility.o `test -f 'wiicarutility/utility.c' || echo '$(srcdir)/'`wiicarutility/utility.c
-
-wiicarutility/wiimotecarapp-utility.obj: wiicarutility/utility.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -MT wiicarutility/wiimotecarapp-utility.obj -MD -MP -MF wiicarutility/$(DEPDIR)/wiimotecarapp-utility.Tpo -c -o wiicarutility/wiimotecarapp-utility.obj `if test -f 'wiicarutility/utility.c'; then $(CYGPATH_W) 'wiicarutility/utility.c'; else $(CYGPATH_W) '$(srcdir)/wiicarutility/utility.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) wiicarutility/$(DEPDIR)/wiimotecarapp-utility.Tpo wiicarutility/$(DEPDIR)/wiimotecarapp-utility.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='wiicarutility/utility.c' object='wiicarutility/wiimotecarapp-utility.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -c -o wiicarutility/wiimotecarapp-utility.obj `if test -f 'wiicarutility/utility.c'; then $(CYGPATH_W) 'wiicarutility/utility.c'; else $(CYGPATH_W) '$(srcdir)/wiicarutility/utility.c'; fi`
-
-controlboard/wiimotecarapp-comm.o: controlboard/comm.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -MT controlboard/wiimotecarapp-comm.o -MD -MP -MF controlboard/$(DEPDIR)/wiimotecarapp-comm.Tpo -c -o controlboard/wiimotecarapp-comm.o `test -f 'controlboard/comm.c' || echo '$(srcdir)/'`controlboard/comm.c
-@am__fastdepCC_TRUE@	$(am__mv) controlboard/$(DEPDIR)/wiimotecarapp-comm.Tpo controlboard/$(DEPDIR)/wiimotecarapp-comm.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='controlboard/comm.c' object='controlboard/wiimotecarapp-comm.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -c -o controlboard/wiimotecarapp-comm.o `test -f 'controlboard/comm.c' || echo '$(srcdir)/'`controlboard/comm.c
-
-controlboard/wiimotecarapp-comm.obj: controlboard/comm.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -MT controlboard/wiimotecarapp-comm.obj -MD -MP -MF controlboard/$(DEPDIR)/wiimotecarapp-comm.Tpo -c -o controlboard/wiimotecarapp-comm.obj `if test -f 'controlboard/comm.c'; then $(CYGPATH_W) 'controlboard/comm.c'; else $(CYGPATH_W) '$(srcdir)/controlboard/comm.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) controlboard/$(DEPDIR)/wiimotecarapp-comm.Tpo controlboard/$(DEPDIR)/wiimotecarapp-comm.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='controlboard/comm.c' object='controlboard/wiimotecarapp-comm.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -c -o controlboard/wiimotecarapp-comm.obj `if test -f 'controlboard/comm.c'; then $(CYGPATH_W) 'controlboard/comm.c'; else $(CYGPATH_W) '$(srcdir)/controlboard/comm.c'; fi`
-
-controlboard/wiimotecarapp-command.o: controlboard/command.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -MT controlboard/wiimotecarapp-command.o -MD -MP -MF controlboard/$(DEPDIR)/wiimotecarapp-command.Tpo -c -o controlboard/wiimotecarapp-command.o `test -f 'controlboard/command.c' || echo '$(srcdir)/'`controlboard/command.c
-@am__fastdepCC_TRUE@	$(am__mv) controlboard/$(DEPDIR)/wiimotecarapp-command.Tpo controlboard/$(DEPDIR)/wiimotecarapp-command.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='controlboard/command.c' object='controlboard/wiimotecarapp-command.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -c -o controlboard/wiimotecarapp-command.o `test -f 'controlboard/command.c' || echo '$(srcdir)/'`controlboard/command.c
-
-controlboard/wiimotecarapp-command.obj: controlboard/command.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -MT controlboard/wiimotecarapp-command.obj -MD -MP -MF controlboard/$(DEPDIR)/wiimotecarapp-command.Tpo -c -o controlboard/wiimotecarapp-command.obj `if test -f 'controlboard/command.c'; then $(CYGPATH_W) 'controlboard/command.c'; else $(CYGPATH_W) '$(srcdir)/controlboard/command.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) controlboard/$(DEPDIR)/wiimotecarapp-command.Tpo controlboard/$(DEPDIR)/wiimotecarapp-command.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='controlboard/command.c' object='controlboard/wiimotecarapp-command.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -c -o controlboard/wiimotecarapp-command.obj `if test -f 'controlboard/command.c'; then $(CYGPATH_W) 'controlboard/command.c'; else $(CYGPATH_W) '$(srcdir)/controlboard/command.c'; fi`
-
-wiimotecar/wiimotecarapp-ControlTasks.o: wiimotecar/ControlTasks.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -MT wiimotecar/wiimotecarapp-ControlTasks.o -MD -MP -MF wiimotecar/$(DEPDIR)/wiimotecarapp-ControlTasks.Tpo -c -o wiimotecar/wiimotecarapp-ControlTasks.o `test -f 'wiimotecar/ControlTasks.c' || echo '$(srcdir)/'`wiimotecar/ControlTasks.c
-@am__fastdepCC_TRUE@	$(am__mv) wiimotecar/$(DEPDIR)/wiimotecarapp-ControlTasks.Tpo wiimotecar/$(DEPDIR)/wiimotecarapp-ControlTasks.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='wiimotecar/ControlTasks.c' object='wiimotecar/wiimotecarapp-ControlTasks.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -c -o wiimotecar/wiimotecarapp-ControlTasks.o `test -f 'wiimotecar/ControlTasks.c' || echo '$(srcdir)/'`wiimotecar/ControlTasks.c
-
-wiimotecar/wiimotecarapp-ControlTasks.obj: wiimotecar/ControlTasks.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -MT wiimotecar/wiimotecarapp-ControlTasks.obj -MD -MP -MF wiimotecar/$(DEPDIR)/wiimotecarapp-ControlTasks.Tpo -c -o wiimotecar/wiimotecarapp-ControlTasks.obj `if test -f 'wiimotecar/ControlTasks.c'; then $(CYGPATH_W) 'wiimotecar/ControlTasks.c'; else $(CYGPATH_W) '$(srcdir)/wiimotecar/ControlTasks.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) wiimotecar/$(DEPDIR)/wiimotecarapp-ControlTasks.Tpo wiimotecar/$(DEPDIR)/wiimotecarapp-ControlTasks.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='wiimotecar/ControlTasks.c' object='wiimotecar/wiimotecarapp-ControlTasks.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -c -o wiimotecar/wiimotecarapp-ControlTasks.obj `if test -f 'wiimotecar/ControlTasks.c'; then $(CYGPATH_W) 'wiimotecar/ControlTasks.c'; else $(CYGPATH_W) '$(srcdir)/wiimotecar/ControlTasks.c'; fi`
-
-wiimotecar/wiimotecarapp-main.o: wiimotecar/main.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -MT wiimotecar/wiimotecarapp-main.o -MD -MP -MF wiimotecar/$(DEPDIR)/wiimotecarapp-main.Tpo -c -o wiimotecar/wiimotecarapp-main.o `test -f 'wiimotecar/main.c' || echo '$(srcdir)/'`wiimotecar/main.c
-@am__fastdepCC_TRUE@	$(am__mv) wiimotecar/$(DEPDIR)/wiimotecarapp-main.Tpo wiimotecar/$(DEPDIR)/wiimotecarapp-main.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='wiimotecar/main.c' object='wiimotecar/wiimotecarapp-main.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -c -o wiimotecar/wiimotecarapp-main.o `test -f 'wiimotecar/main.c' || echo '$(srcdir)/'`wiimotecar/main.c
-
-wiimotecar/wiimotecarapp-main.obj: wiimotecar/main.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -MT wiimotecar/wiimotecarapp-main.obj -MD -MP -MF wiimotecar/$(DEPDIR)/wiimotecarapp-main.Tpo -c -o wiimotecar/wiimotecarapp-main.obj `if test -f 'wiimotecar/main.c'; then $(CYGPATH_W) 'wiimotecar/main.c'; else $(CYGPATH_W) '$(srcdir)/wiimotecar/main.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) wiimotecar/$(DEPDIR)/wiimotecarapp-main.Tpo wiimotecar/$(DEPDIR)/wiimotecarapp-main.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='wiimotecar/main.c' object='wiimotecar/wiimotecarapp-main.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -c -o wiimotecar/wiimotecarapp-main.obj `if test -f 'wiimotecar/main.c'; then $(CYGPATH_W) 'wiimotecar/main.c'; else $(CYGPATH_W) '$(srcdir)/wiimotecar/main.c'; fi`
-
-wiimotecar/wiimotecarapp-wiicar_math.o: wiimotecar/wiicar_math.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -MT wiimotecar/wiimotecarapp-wiicar_math.o -MD -MP -MF wiimotecar/$(DEPDIR)/wiimotecarapp-wiicar_math.Tpo -c -o wiimotecar/wiimotecarapp-wiicar_math.o `test -f 'wiimotecar/wiicar_math.c' || echo '$(srcdir)/'`wiimotecar/wiicar_math.c
-@am__fastdepCC_TRUE@	$(am__mv) wiimotecar/$(DEPDIR)/wiimotecarapp-wiicar_math.Tpo wiimotecar/$(DEPDIR)/wiimotecarapp-wiicar_math.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='wiimotecar/wiicar_math.c' object='wiimotecar/wiimotecarapp-wiicar_math.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -c -o wiimotecar/wiimotecarapp-wiicar_math.o `test -f 'wiimotecar/wiicar_math.c' || echo '$(srcdir)/'`wiimotecar/wiicar_math.c
-
-wiimotecar/wiimotecarapp-wiicar_math.obj: wiimotecar/wiicar_math.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -MT wiimotecar/wiimotecarapp-wiicar_math.obj -MD -MP -MF wiimotecar/$(DEPDIR)/wiimotecarapp-wiicar_math.Tpo -c -o wiimotecar/wiimotecarapp-wiicar_math.obj `if test -f 'wiimotecar/wiicar_math.c'; then $(CYGPATH_W) 'wiimotecar/wiicar_math.c'; else $(CYGPATH_W) '$(srcdir)/wiimotecar/wiicar_math.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) wiimotecar/$(DEPDIR)/wiimotecarapp-wiicar_math.Tpo wiimotecar/$(DEPDIR)/wiimotecarapp-wiicar_math.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='wiimotecar/wiicar_math.c' object='wiimotecar/wiimotecarapp-wiicar_math.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -c -o wiimotecar/wiimotecarapp-wiicar_math.obj `if test -f 'wiimotecar/wiicar_math.c'; then $(CYGPATH_W) 'wiimotecar/wiicar_math.c'; else $(CYGPATH_W) '$(srcdir)/wiimotecar/wiicar_math.c'; fi`
-
-wiimotecar/wiimotecarapp-WiiMotor.o: wiimotecar/WiiMotor.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -MT wiimotecar/wiimotecarapp-WiiMotor.o -MD -MP -MF wiimotecar/$(DEPDIR)/wiimotecarapp-WiiMotor.Tpo -c -o wiimotecar/wiimotecarapp-WiiMotor.o `test -f 'wiimotecar/WiiMotor.c' || echo '$(srcdir)/'`wiimotecar/WiiMotor.c
-@am__fastdepCC_TRUE@	$(am__mv) wiimotecar/$(DEPDIR)/wiimotecarapp-WiiMotor.Tpo wiimotecar/$(DEPDIR)/wiimotecarapp-WiiMotor.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='wiimotecar/WiiMotor.c' object='wiimotecar/wiimotecarapp-WiiMotor.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -c -o wiimotecar/wiimotecarapp-WiiMotor.o `test -f 'wiimotecar/WiiMotor.c' || echo '$(srcdir)/'`wiimotecar/WiiMotor.c
-
-wiimotecar/wiimotecarapp-WiiMotor.obj: wiimotecar/WiiMotor.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -MT wiimotecar/wiimotecarapp-WiiMotor.obj -MD -MP -MF wiimotecar/$(DEPDIR)/wiimotecarapp-WiiMotor.Tpo -c -o wiimotecar/wiimotecarapp-WiiMotor.obj `if test -f 'wiimotecar/WiiMotor.c'; then $(CYGPATH_W) 'wiimotecar/WiiMotor.c'; else $(CYGPATH_W) '$(srcdir)/wiimotecar/WiiMotor.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) wiimotecar/$(DEPDIR)/wiimotecarapp-WiiMotor.Tpo wiimotecar/$(DEPDIR)/wiimotecarapp-WiiMotor.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='wiimotecar/WiiMotor.c' object='wiimotecar/wiimotecarapp-WiiMotor.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wiimotecarapp_CFLAGS) $(CFLAGS) -c -o wiimotecar/wiimotecarapp-WiiMotor.obj `if test -f 'wiimotecar/WiiMotor.c'; then $(CYGPATH_W) 'wiimotecar/WiiMotor.c'; else $(CYGPATH_W) '$(srcdir)/wiimotecar/WiiMotor.c'; fi`
+$(RECURSIVE_CLEAN_TARGETS):
+	@fail= failcom='exit 1'; \
+	for f in x $$MAKEFLAGS; do \
+	  case $$f in \
+	    *=* | --[!k]*);; \
+	    *k*) failcom='fail=yes';; \
+	  esac; \
+	done; \
+	dot_seen=no; \
+	case "$@" in \
+	  distclean-* | maintainer-clean-*) list='$(DIST_SUBDIRS)' ;; \
+	  *) list='$(SUBDIRS)' ;; \
+	esac; \
+	rev=''; for subdir in $$list; do \
+	  if test "$$subdir" = "."; then :; else \
+	    rev="$$subdir $$rev"; \
+	  fi; \
+	done; \
+	rev="$$rev ."; \
+	target=`echo $@ | sed s/-recursive//`; \
+	for subdir in $$rev; do \
+	  echo "Making $$target in $$subdir"; \
+	  if test "$$subdir" = "."; then \
+	    local_target="$$target-am"; \
+	  else \
+	    local_target="$$target"; \
+	  fi; \
+	  ($(am__cd) $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
+	  || eval $$failcom; \
+	done && test -z "$$fail"
+tags-recursive:
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	  test "$$subdir" = . || ($(am__cd) $$subdir && $(MAKE) $(AM_MAKEFLAGS) tags); \
+	done
+ctags-recursive:
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	  test "$$subdir" = . || ($(am__cd) $$subdir && $(MAKE) $(AM_MAKEFLAGS) ctags); \
+	done
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -494,10 +354,23 @@ ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	mkid -fID $$unique
 tags: TAGS
 
-TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	set x; \
 	here=`pwd`; \
+	if ($(ETAGS) --etags-include --version) >/dev/null 2>&1; then \
+	  include_option=--etags-include; \
+	  empty_fix=.; \
+	else \
+	  include_option=--include; \
+	  empty_fix=; \
+	fi; \
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	  if test "$$subdir" = .; then :; else \
+	    test ! -f $$subdir/TAGS || \
+	      set "$$@" "$$include_option=$$here/$$subdir/TAGS"; \
+	  fi; \
+	done; \
 	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
 	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
@@ -516,7 +389,7 @@ TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 	  fi; \
 	fi
 ctags: CTAGS
-CTAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+CTAGS: ctags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
@@ -566,6 +439,34 @@ distdir: $(DISTFILES)
 	    test -f "$(distdir)/$$file" \
 	    || cp -p $$d/$$file "$(distdir)/$$file" \
 	    || exit 1; \
+	  fi; \
+	done
+	@list='$(DIST_SUBDIRS)'; for subdir in $$list; do \
+	  if test "$$subdir" = .; then :; else \
+	    test -d "$(distdir)/$$subdir" \
+	    || $(MKDIR_P) "$(distdir)/$$subdir" \
+	    || exit 1; \
+	  fi; \
+	done
+	@list='$(DIST_SUBDIRS)'; for subdir in $$list; do \
+	  if test "$$subdir" = .; then :; else \
+	    dir1=$$subdir; dir2="$(distdir)/$$subdir"; \
+	    $(am__relativize); \
+	    new_distdir=$$reldir; \
+	    dir1=$$subdir; dir2="$(top_distdir)"; \
+	    $(am__relativize); \
+	    new_top_distdir=$$reldir; \
+	    echo " (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) top_distdir="$$new_top_distdir" distdir="$$new_distdir" \\"; \
+	    echo "     am__remove_distdir=: am__skip_length_check=: am__skip_mode_fix=: distdir)"; \
+	    ($(am__cd) $$subdir && \
+	      $(MAKE) $(AM_MAKEFLAGS) \
+	        top_distdir="$$new_top_distdir" \
+	        distdir="$$new_distdir" \
+		am__remove_distdir=: \
+		am__skip_length_check=: \
+		am__skip_mode_fix=: \
+	        distdir) \
+	      || exit 1; \
 	  fi; \
 	done
 	-test -n "$(am__skip_mode_fix)" \
@@ -684,21 +585,19 @@ distcleancheck: distclean
 	       $(distcleancheck_listfiles) ; \
 	       exit 1; } >&2
 check-am: all-am
-check: check-am
-all-am: Makefile $(PROGRAMS)
-installdirs:
-	for dir in "$(DESTDIR)$(bindir)"; do \
-	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
-	done
-install: install-am
-install-exec: install-exec-am
-install-data: install-data-am
-uninstall: uninstall-am
+check: check-recursive
+all-am: Makefile
+installdirs: installdirs-recursive
+installdirs-am:
+install: install-recursive
+install-exec: install-exec-recursive
+install-data: install-data-recursive
+uninstall: uninstall-recursive
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 
-installcheck: installcheck-am
+installcheck: installcheck-recursive
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
 	  install_sh_PROGRAM="$(INSTALL_STRIP_PROGRAM)" INSTALL_STRIP_FLAG=-s \
@@ -711,104 +610,98 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
-	-rm -f controlboard/$(DEPDIR)/$(am__dirstamp)
-	-rm -f controlboard/$(am__dirstamp)
-	-rm -f wiicarutility/$(DEPDIR)/$(am__dirstamp)
-	-rm -f wiicarutility/$(am__dirstamp)
-	-rm -f wiimotecar/$(DEPDIR)/$(am__dirstamp)
-	-rm -f wiimotecar/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-clean: clean-am
+clean: clean-recursive
 
-clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
+clean-am: clean-generic clean-libtool mostlyclean-am
 
-distclean: distclean-am
+distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf controlboard/$(DEPDIR) wiicarutility/$(DEPDIR) wiimotecar/$(DEPDIR)
 	-rm -f Makefile
-distclean-am: clean-am distclean-compile distclean-generic \
+distclean-am: clean-am distclean-generic distclean-libtool \
 	distclean-tags
 
-dvi: dvi-am
+dvi: dvi-recursive
 
 dvi-am:
 
-html: html-am
+html: html-recursive
 
 html-am:
 
-info: info-am
+info: info-recursive
 
 info-am:
 
 install-data-am:
 
-install-dvi: install-dvi-am
+install-dvi: install-dvi-recursive
 
 install-dvi-am:
 
-install-exec-am: install-binPROGRAMS
+install-exec-am:
 
-install-html: install-html-am
+install-html: install-html-recursive
 
 install-html-am:
 
-install-info: install-info-am
+install-info: install-info-recursive
 
 install-info-am:
 
 install-man:
 
-install-pdf: install-pdf-am
+install-pdf: install-pdf-recursive
 
 install-pdf-am:
 
-install-ps: install-ps-am
+install-ps: install-ps-recursive
 
 install-ps-am:
 
 installcheck-am:
 
-maintainer-clean: maintainer-clean-am
+maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf controlboard/$(DEPDIR) wiicarutility/$(DEPDIR) wiimotecar/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
-mostlyclean: mostlyclean-am
+mostlyclean: mostlyclean-recursive
 
-mostlyclean-am: mostlyclean-compile mostlyclean-generic
+mostlyclean-am: mostlyclean-generic mostlyclean-libtool
 
-pdf: pdf-am
+pdf: pdf-recursive
 
 pdf-am:
 
-ps: ps-am
+ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS
+uninstall-am:
 
-.MAKE: install-am install-strip
+.MAKE: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) ctags-recursive \
+	install-am install-strip tags-recursive
 
-.PHONY: CTAGS GTAGS all all-am am--refresh check check-am clean \
-	clean-binPROGRAMS clean-generic ctags dist dist-all dist-bzip2 \
+.PHONY: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) CTAGS GTAGS \
+	all all-am am--refresh check check-am clean clean-generic \
+	clean-libtool ctags ctags-recursive dist dist-all dist-bzip2 \
 	dist-gzip dist-lzma dist-shar dist-tarZ dist-xz dist-zip \
-	distcheck distclean distclean-compile distclean-generic \
+	distcheck distclean distclean-generic distclean-libtool \
 	distclean-tags distcleancheck distdir distuninstallcheck dvi \
 	dvi-am html html-am info info-am install install-am \
-	install-binPROGRAMS install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am install-man \
-	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
+	install-data install-data-am install-dvi install-dvi-am \
+	install-exec install-exec-am install-html install-html-am \
+	install-info install-info-am install-man install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs installdirs-am \
 	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-binPROGRAMS
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags tags-recursive uninstall uninstall-am
 
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

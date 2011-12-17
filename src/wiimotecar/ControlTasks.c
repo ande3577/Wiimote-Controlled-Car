@@ -18,12 +18,13 @@
 #include <error.h>
 #include <errno.h>
 #include <time.h>
-#include <timestamp.h>
-#include <error_message.h>
+#include <wiicarutility/timestamp.h>
+#include <wiicarutility/error_message.h>
+#include <controlboard/control_board.h>
 
 #include "wiicar.h"
 #include "ControlTasks.h"
-#include "control_board.h"
+
 
 
 cwiid_mesg_callback_t cwiid_callback;
