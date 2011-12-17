@@ -106,10 +106,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/wiimotecar}&quot;"/>
 								</option>
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.183978094" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
-									<listOptionValue builtIn="false" value="__DEVICE_VERSION__=\&quot;0.0.1\&quot;"/>
 									<listOptionValue builtIn="false" value="_DIAGNOSTIC_MODE=0"/>
 									<listOptionValue builtIn="false" value="_DEBUG=1"/>
-									<listOptionValue builtIn="false" value="__GCC__=\&quot;gcc\&quot;"/>
 								</option>
 								<option id="gnu.c.compiler.option.misc.other.1702488271" name="Other flags" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0 -std=gnu99" valueType="string"/>
 								<option id="gnu.c.compiler.option.misc.pic.1245974305" name="Position Independent Code (-fPIC)" superClass="gnu.c.compiler.option.misc.pic" value="true" valueType="boolean"/>
@@ -182,10 +180,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/wiimotecar}&quot;"/>
 								</option>
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1036627479" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
-									<listOptionValue builtIn="false" value="__DEVICE_VERSION__=\&quot;0.0.1\&quot;"/>
 									<listOptionValue builtIn="false" value="_DIAGNOSTIC_MODE=0"/>
 									<listOptionValue builtIn="false" value="_DEBUG=1"/>
-									<listOptionValue builtIn="false" value="__GCC__=\&quot;gcc\&quot;"/>
 								</option>
 								<option id="gnu.c.compiler.option.misc.other.1934011233" name="Other flags" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0 -std=gnu99 -export-dynamic `pkg-config --cflags --libs gtk+-2.0`" valueType="string"/>
 								<option id="gnu.c.compiler.option.misc.pic.1914726025" name="Position Independent Code (-fPIC)" superClass="gnu.c.compiler.option.misc.pic" value="true" valueType="boolean"/>
@@ -259,10 +255,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/wiimotecar}&quot;"/>
 								</option>
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.2135757147" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
-									<listOptionValue builtIn="false" value="__DEVICE_VERSION__=\&quot;0.0.1\&quot;"/>
 									<listOptionValue builtIn="false" value="_DIAGNOSTIC_MODE=0"/>
 									<listOptionValue builtIn="false" value="_DEBUG=1"/>
-									<listOptionValue builtIn="false" value="__GCC__=\&quot;gcc\&quot;"/>
 								</option>
 								<option id="gnu.c.compiler.option.misc.other.2066533351" name="Other flags" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0 -std=gnu99 -export-dynamic `pkg-config --cflags --libs gtk+-2.0`" valueType="string"/>
 								<option id="gnu.c.compiler.option.misc.pic.140303944" name="Position Independent Code (-fPIC)" superClass="gnu.c.compiler.option.misc.pic" value="true" valueType="boolean"/>
