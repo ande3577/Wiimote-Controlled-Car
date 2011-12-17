@@ -266,7 +266,6 @@ void count_ir_points(
 		}
 		else
 		{
-			/// \todo HIGH: eventually remove this break once IR logic can handle more than 3 points, or points in wrong order
 			break;
 		}
 

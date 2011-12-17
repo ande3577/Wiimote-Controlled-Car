@@ -186,7 +186,6 @@ int32_t get_last_error(int32_t *error_id, int32_t *timestamp)
 	ret_val = sscanf(params, "%s %d", error_id_string, timestamp);
 	if (ret_val == 2)
 	{
-		/// \todo why can't i link this
 		*error_id = decode_error_response(error_id_string);
 	}
 

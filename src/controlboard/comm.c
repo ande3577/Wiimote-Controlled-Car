@@ -182,7 +182,6 @@ int32_t comm_validate_response(char *response, char *send, char *parameters)
 			return ERR_INVALID_RESPONSE;
 
 		strcpy(parameters, temp_buffer + strlen(":ERR"));
-		/// \todo why can't i link this?
 		return decode_error_response(parameters);
 	}
 
