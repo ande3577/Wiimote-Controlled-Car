@@ -10,5 +10,5 @@ AM_INIT_AUTOMAKE()
 
 AC_PROG_CC
 
-AC_CONFIG_FILES(Makefile src/Makefile)
+AC_CONFIG_FILES(Makefile controlboard/Makefile wiicarutility/Makefile wiimotecar/Makefile)
 AC_OUTPUT
