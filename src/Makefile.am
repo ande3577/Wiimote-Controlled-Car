@@ -1,0 +1,1 @@
+SUBDIRS = controlboard wiicarutility wiimotecar
