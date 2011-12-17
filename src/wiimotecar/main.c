@@ -1,26 +1,24 @@
 /****************
-* Helloworld.cpp
-*****************/
+ * Helloworld.cpp
+ *****************/
 #include <stdio.h>
 #include <unistd.h>
 
 #include "ControlTasks.h"
-#include "program_info.h"
 
 //#define PORT_NAME "/dev/ttyUSB0"
 #define PORT_NAME "/dev/ttyS0"
 //#define PORT_NAME "/dev/rfcomm0"
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
 	char *dev_name;
 
 #if _DEBUG
-	printf("\nWiimote Controlled Car (CWiid)\n");
+	printf("\n%s\n", PACKAGE_NAME);
 #if _DIAGNOSTIC_MODE
 	printf("Diagnostic Mode\n");
 #endif
-	printf("Version: %s\n",__DEVICE_VERSION__);
+	printf("Version: %s\n",PACKAGE_VERSION);
 	printf("Built with: GCC, version; %s\n", __VERSION__);
 	printf("On: %s, %s\n",__DATE__,__TIME__);
 	printf("\n");

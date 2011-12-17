@@ -2,9 +2,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "control_board.h"
+#include <control_board.h>
+#include <timestamp.h>
 #include "wiicar_math.h"
-#include "timestamp.h"
 #include "hardware.h"
 #include "utility.h"
 

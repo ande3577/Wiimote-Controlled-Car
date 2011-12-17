@@ -10,7 +10,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "hardware.h"
+#include <hardware.h>
 
 
 extern volatile bool timer_flag;

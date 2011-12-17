@@ -18,13 +18,13 @@
 #include <error.h>
 #include <errno.h>
 #include <time.h>
+#include <timestamp.h>
+#include <error_message.h>
 
 #include "wiicar.h"
 #include "ControlTasks.h"
-#include "timestamp.h"
 #include "control_board.h"
-#include "error_message.h"
-#include "program_info.h"
+
 
 cwiid_mesg_callback_t cwiid_callback;
 
@@ -158,8 +158,8 @@ void control_tasks(char *dev_name)
 		}
 	} while (1);
 
-	set_lcd(0, "Wiimote Car");
-	set_lcd(1, "Rev: %s", __DEVICE_VERSION__);
+	set_lcd(0, "%s", PACKAGE_NAME);
+	set_lcd(1, "Rev: %s", PACKAGE_VERSION);
 
 	// display startup for 1 s
 	sleep(1);
