@@ -55,6 +55,9 @@ am_wiimotecarapp_OBJECTS = ControlTasks.$(OBJEXT) main.$(OBJEXT) \
 wiimotecarapp_OBJECTS = $(am_wiimotecarapp_OBJECTS)
 wiimotecarapp_DEPENDENCIES = ../controlboard/libcontrolboard.la \
 	../wiicarutility/libwiicarutility.la
+wiimotecarapp_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(wiimotecarapp_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -196,6 +199,9 @@ top_srcdir = @top_srcdir@
 wiimotecarapp_SOURCES = ControlTasks.c main.c wiicar_math.c WiiMotor.c
 wiimotecarapp_LDADD = ../controlboard/libcontrolboard.la ../wiicarutility/libwiicarutility.la
 AM_CPPFLAGS = -I ../
+
+#this has to be added here for OpenWRT, since AC_SEARCH_LIBS not working
+wiimotecarapp_LDFLAGS = -lm -lcwiid -lbluetooth
 all: all-am
 
 .SUFFIXES:
@@ -275,7 +281,7 @@ clean-binPROGRAMS:
 	rm -f $$list
 wiimotecarapp$(EXEEXT): $(wiimotecarapp_OBJECTS) $(wiimotecarapp_DEPENDENCIES) 
 	@rm -f wiimotecarapp$(EXEEXT)
-	$(LINK) $(wiimotecarapp_OBJECTS) $(wiimotecarapp_LDADD) $(LIBS)
+	$(wiimotecarapp_LINK) $(wiimotecarapp_OBJECTS) $(wiimotecarapp_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

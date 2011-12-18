@@ -5,3 +5,5 @@ wiimotecarapp_LDADD = ../controlboard/libcontrolboard.la ../wiicarutility/libwii
 
 AM_CPPFLAGS = -I ../
 
+#this has to be added here for OpenWRT, since AC_SEARCH_LIBS not working
+wiimotecarapp_LDFLAGS = -lm -lcwiid -lbluetooth

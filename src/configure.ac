@@ -18,17 +18,6 @@ AC_PROG_MAKE_SET
 AC_PROG_LIBTOOL
 AC_CONFIG_MACRO_DIR([m4])
 
-# Checks for libraries.
-AC_SEARCH_LIBS([asin], [m], [], [
-  AC_MSG_ERROR([unable to locate math])
-])
-
-
-AC_SEARCH_LIBS([cwiid_open], [cwiid], [], [
-  AC_MSG_ERROR([unable to locate cwiid])
-])
-
-
 # Checks for header files.
 AC_CHECK_HEADERS([fcntl.h stddef.h stdint.h stdlib.h string.h sys/time.h termios.h unistd.h])
 
