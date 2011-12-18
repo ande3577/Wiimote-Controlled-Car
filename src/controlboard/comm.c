@@ -14,10 +14,10 @@
 #include <errno.h>   /* Error number definitions */
 #include <termios.h> /* POSIX terminal control definitions */
 #include <stdarg.h>
+#include <wiicarutility/timestamp.h>
+#include <wiicarutility/error_message.h>
 
 #include "control_board.h"
-#include "timestamp.h"
-#include "error_message.h"
 
 int32_t fd; // file descriptor for the port
 

@@ -4,9 +4,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+#include <wiicarutility/error_message.h>
+
 #include "comm.h"
 #include "control_board.h"
-#include "error_message.h"
+
 
 char params[256];
 char lcd_text[256];

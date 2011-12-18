@@ -2,11 +2,11 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "control_board.h"
+#include <controlboard/control_board.h>
+#include <controlboard/hardware.h>
+#include <wiicarutility/timestamp.h>
+#include <wiicarutility/utility.h>
 #include "wiicar_math.h"
-#include "timestamp.h"
-#include "hardware.h"
-#include "utility.h"
 
 #define MAX_FORWARD_PITCH (45 * DEGREE_SCALING)
 #define MAX_REVERSE_PITCH (45 * DEGREE_SCALING)

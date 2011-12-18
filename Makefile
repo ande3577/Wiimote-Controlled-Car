@@ -102,7 +102,7 @@ endef
 # directory) to the install directory.
 define Package/cwiimotecar/install
 	$(INSTALL_DIR) $(1)/bin
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/wiimotecarapp $(1)/bin/
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/wiimotecar/wiimotecarapp $(1)/bin/
 endef
 
 
