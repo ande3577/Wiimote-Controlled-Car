@@ -169,9 +169,6 @@ int32_t comm_validate_response(char *response, char *send, char *parameters)
 
 int32_t comm_query(char *parameters, const char *fmt, ...)
 {
-	if (diagnostic_mode)
-		return ERR_NONE;
-
 	int32_t ret_val;
 	va_list args;
 	va_start(args, fmt);
@@ -181,6 +178,9 @@ int32_t comm_query(char *parameters, const char *fmt, ...)
 
 	if (comm_trace)
 		printf("@%u: << %s\n", get_tick_count(), tx_buffer);
+
+	if (diagnostic_mode)
+		return ERR_NONE;
 
 	ret_val = comm_writeline(tx_buffer);
 	if (0 >= ret_val)

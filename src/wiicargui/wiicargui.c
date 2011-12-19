@@ -114,13 +114,6 @@ void error_handler(GtkWidget *parent, int32_t error_code)
 	}
 }
 
-void on_window_destroy(GtkObject *object, gpointer user_data)
-{
-	g_print("Window Closed\n");
-	gtk_main_quit();
-	exit(1);
-}
-
 void update_led_control(GtkComboBox *combobox, StatusLedFlashState_t led_state,
 		int32_t flash_rate)
 {
@@ -821,6 +814,8 @@ void init_gui(int argc, char *argv[])
 
 void shutdown_gui()
 {
+	g_print("Window Closed\n");
 	pthread_join(gtk_thread, NULL);
+	gtk_main_quit();
 }
 

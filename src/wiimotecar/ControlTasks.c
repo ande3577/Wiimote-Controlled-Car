@@ -22,14 +22,18 @@
 #include <wiicarutility/error_message.h>
 #include <wiicarutility/utility.h>
 #include <controlboard/control_board.h>
-#ifdef _PC_SIM
+#if HAVE_GTK
 #include <wiicargui/wiicargui.h>
 #endif
+#include <config.h>
 
 #include "wiicar.h"
 #include "ControlTasks.h"
 
+
 cwiid_mesg_callback_t cwiid_callback;
+
+cwiid_wiimote_t *wiimote = NULL;
 
 WiimoteStatusDataType wiimote_status_data =
 { 0 };
@@ -118,7 +122,6 @@ void err(cwiid_wiimote_t *wiimote, const char *s, va_list ap)
  */
 void control_tasks(char *dev_name)
 {
-	cwiid_wiimote_t *wiimote = NULL;
 	WiimoteState_t WiimoteState = WII_PROMPT;
 	bdaddr_t bdaddr = *BDADDR_ANY; /* bluetooth device address */
 
@@ -128,7 +131,7 @@ void control_tasks(char *dev_name)
 	pthread_mutex_lock(&mutex);
 #endif
 
-#if _PC_SIM
+#if HAVE_GTK
 	int argc_dummy = 0;
 	char **argv_dummy = NULL;
 	init_gui(argc_dummy, argv_dummy);
@@ -205,13 +208,7 @@ void control_tasks(char *dev_name)
 		default:
 			main_menu(wiimote, &wiimote_status_data);
 			debug_print("exiting.\n");
-#if _MUTEX_ENABLE
-			pthread_mutex_destroy(&mutex);
-#endif
-#if _PC_SIM
-			shutdown_gui();
-#endif
-			exit(0);
+			shutdown_application(0);
 			break;
 		}
 	}
@@ -278,7 +275,7 @@ ErrorID_t main_menu(cwiid_wiimote_t *wiimote,
 			}
 			else if (0 < error)
 			{
-				exit(-3);
+				shutdown_application(error);
 			}
 			else if (wiimote_status->button_data != last_button_state)
 			{
@@ -825,10 +822,11 @@ void cwiid_callback(cwiid_wiimote_t *wiimote, int mesg_count,
 			{
 				fprintf(stderr, "@%u: Error on wiimote disconnect\n",
 						get_tick_count());
-				exit(-1);
+				shutdown_application(-1);
 
 			}
-			exit(0);
+
+			shutdown_application(0);
 			break;
 		default:
 #if _DEBUG > 2
@@ -927,7 +925,23 @@ ErrorID_t error_mode(cwiid_wiimote_t *wiimote,
 		volatile WiimoteStatusDataType *wiimote_status)
 {
 	debug_print("@%u: An error has occurred\n", get_tick_count());
-	shutdown_all(wiimote);
-	exit(-1);
+	shutdown_application(-1);
+	return ERR_UNKN;
 }
+
+void shutdown_application(int32_t exit_code)
+{
+	shutdown_all(wiimote);
+#if HAVE_GTK
+	shutdown_gui();
+#endif
+	exit(exit_code);
+}
+
+#if HAVE_GTK
+void on_window_destroy(GtkObject *object, gpointer user_data)
+{
+	shutdown_application(0);
+}
+#endif
 

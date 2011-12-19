@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include <config.h>
 
 #include "ControlTasks.h"
 
@@ -11,18 +12,15 @@
 #define PORT_NAME "/dev/ttyS0"
 //#define PORT_NAME "/dev/rfcomm0"
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
 	char *dev_name;
 
-#if _PC_SIM
-
-#endif
-
 #if _DEBUG
-	printf("\n%s\n", PACKAGE_NAME);
-	printf("Version: %s\n",PACKAGE_VERSION);
+	printf("\n%s\n", PACKAGE_STRING);
 	printf("Built with: GCC, version; %s\n", __VERSION__);
-	printf("On: %s, %s\n",__DATE__,__TIME__);
+	printf("On: %s, %s\n", __DATE__, __TIME__);
+	printf("%s\n", PACKAGE_BUGREPORT);
 	printf("\n");
 #endif
 

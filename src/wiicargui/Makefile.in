@@ -47,6 +47,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
+CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
@@ -76,7 +77,10 @@ libwiicargui_la_DEPENDENCIES = ../controlboard/libcontrolboard.la \
 	../wiicarutility/libwiicarutility.la
 am_libwiicargui_la_OBJECTS = wiicargui.lo
 libwiicargui_la_OBJECTS = $(am_libwiicargui_la_OBJECTS)
-DEFAULT_INCLUDES = -I.@am__isrc@
+libwiicargui_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(libwiicargui_la_LDFLAGS) $(LDFLAGS) -o $@
+DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
@@ -225,7 +229,7 @@ libwiicargui_la_SOURCES = wiicargui.c
 include_HEADERS = wiicargui.h
 libwiicargui_la_LIBADD = ../controlboard/libcontrolboard.la ../wiicarutility/libwiicarutility.la
 AM_CPPFLAGS = -I ../ -export-dynamic `pkg-config --cflags --libs gtk+-2.0`
-AM_LDFLAGS = -export-dynamic `pkg-config --cflags --libs gtk+-2.0`
+libwiicargui_la_LDFLAGS = -export-dynamic `pkg-config --cflags --libs gtk+-2.0`
 all: all-am
 
 .SUFFIXES:
@@ -292,7 +296,7 @@ clean-libLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libwiicargui.la: $(libwiicargui_la_OBJECTS) $(libwiicargui_la_DEPENDENCIES) 
-	$(LINK) -rpath $(libdir) $(libwiicargui_la_OBJECTS) $(libwiicargui_la_LIBADD) $(LIBS)
+	$(libwiicargui_la_LINK) -rpath $(libdir) $(libwiicargui_la_OBJECTS) $(libwiicargui_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
