@@ -235,7 +235,6 @@ top_srcdir = @top_srcdir@
 SUBDIRS = wiicarutility controlboard $(am__append_1) wiimotecar
 AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = -I m4
-STANDARD = gnu99
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 

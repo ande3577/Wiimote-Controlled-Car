@@ -24,6 +24,7 @@
 #include <controlboard/control_board.h>
 #if HAVE_GTK
 #include <wiicargui/wiicargui.h>
+#include <gtk/gtk.h>
 #endif
 #include <config.h>
 
@@ -290,8 +291,7 @@ ErrorID_t main_menu(cwiid_wiimote_t *wiimote,
 				}
 				else if (last_button_state & CWIID_BTN_HOME) // reset
 				{
-					shutdown_all(wiimote);
-					return true;
+					shutdown_application(0);
 				}
 				else if (last_button_state & CWIID_BTN_PLUS)
 				{
