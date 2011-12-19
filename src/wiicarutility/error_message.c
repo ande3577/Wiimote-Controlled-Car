@@ -10,7 +10,6 @@
 #include "error_message.h"
 
 /// \todo need to update this with controller board
-/// \todo for some reason will not link if these functions in different file
 int32_t decode_error_response(char *response)
 {
 	if (!strncmp(response, "PARAM", strlen("PARAM")))

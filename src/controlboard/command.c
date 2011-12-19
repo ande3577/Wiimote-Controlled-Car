@@ -9,85 +9,141 @@
 #include "comm.h"
 #include "control_board.h"
 
-
 char params[256];
-char lcd_text[256];
+char lcd_line_text[LCD_TEXT_LINES][256];
 
-int32_t set_motor_levels(int32_t channel1, int32_t channel2)
+int32_t motor_level[NUMBER_OF_MOTOR_CHANNELS] =
+{ 0 };
+
+int32_t sensor_values[NUMBER_OF_SENSOR_CHANNELS] =
+{ 0 };
+
+bool ir_led_value = false;
+
+struct led_flash_status_t status_led_status;
+
+struct led_flash_status_t error_led_status;
+
+int32_t motor_timeout;
+bool motor_timeout_changed = true;
+uint32_t timestamp;
+
+error_info_t last_error;
+
+char pgm_info[256];
+
+int32_t write_motor_levels(int32_t channel1, int32_t channel2)
 {
-	return comm_query(params, "SML %d %d", channel1, channel2);
+	int32_t ret_val = comm_query(params, "SML %d %d", channel1, channel2);
+	if (ret_val == ERR_NONE)
+	{
+		motor_level[MOTOR_SPEED_CHANNEL] = channel1;
+		motor_level[MOTOR_DIRECTION_CHANNEL] = channel2;
+	}
+	return ret_val;
 }
 
-int32_t get_motor_levels(int32_t *channel1, int32_t *channel2)
+int32_t read_motor_levels()
 {
 	int32_t ret_val;
 	ret_val = comm_query(params, "GML");
 	if (0 > ret_val)
 		return ret_val;
 
-	ret_val = sscanf(params, "%d %d", channel1, channel2);
-	if (ret_val == 2)
+	int32_t motor_channels_temp[NUMBER_OF_MOTOR_CHANNELS];
+	ret_val = sscanf(params, "%d %d", &motor_channels_temp[0],
+			&motor_channels_temp[1]);
+	if (ret_val == NUMBER_OF_MOTOR_CHANNELS)
+	{
+		uint8_t i;
+		for (i = 0; i < NUMBER_OF_MOTOR_CHANNELS; i++)
+		{
+			motor_level[i] = motor_channels_temp[i];
+		}
 		return ERR_NONE;
+	}
 	else
+	{
 		return ERR_PARAM;
+	}
 }
 
-int32_t get_motor_pwm_counts(int32_t *channel1, int32_t *channel2)
+const int32_t *get_motor_levels()
 {
-	int32_t ret_val;
-	ret_val = comm_query(params, "GMP");
-	if (0 > ret_val)
-		return ret_val;
-
-	ret_val = sscanf(params, "%d %d", channel1, channel2);
-	if (ret_val == 2)
-		return ERR_NONE;
-	else
-		return ERR_PARAM;
+	return motor_level;
 }
 
-int32_t get_sensor_value(int32_t *channel1, int32_t *channel2)
+int32_t read_sensor_values()
 {
 	int32_t ret_val;
 	ret_val = comm_query(params, "GSV");
 	if (0 > ret_val)
 		return ret_val;
 
-	ret_val = sscanf(params, "%d %d", channel1, channel2);
-	if (ret_val == 2)
+	int32_t sensor_values_temp[NUMBER_OF_SENSOR_CHANNELS];
+	ret_val = sscanf(params, "%d %d %d %d %d", &sensor_values_temp[0],
+			&sensor_values_temp[1], &sensor_values_temp[2],
+			&sensor_values_temp[3], &sensor_values_temp[4]);
+
+	if (ret_val == NUMBER_OF_SENSOR_CHANNELS)
 		return ERR_NONE;
 	else
 		return ERR_PARAM;
 }
 
-int32_t set_motor_timeout(int32_t timeout)
+const int32_t *get_sensor_values()
 {
-	return comm_query(params, "SMT %d", timeout);
+	return sensor_values;
 }
 
-int32_t get_motor_timeout(int32_t *timeout)
+int32_t set_motor_timeout(int32_t timeout)
+{
+	int32_t ret_val = comm_query(params, "SMT %d", timeout);
+	if (ret_val == ERR_NONE)
+		motor_timeout = timeout;
+	return ret_val;
+}
+
+int32_t read_motor_timeout()
 {
 	int32_t ret_val;
 	ret_val = comm_query(params, "GMT");
 	if (0 > ret_val)
 		return ret_val;
 
-	ret_val = sscanf(params, "%d", timeout);
+	int32_t timeout_temp;
+	ret_val = sscanf(params, "%d", &timeout_temp);
 	if (ret_val == 1)
+	{
+		motor_timeout = timeout_temp;
 		return ERR_NONE;
+	}
 	else
+	{
 		return ERR_PARAM;
+	}
+}
+
+const int32_t *get_motor_timeout()
+{
+	return &motor_timeout;
 }
 
 int32_t set_ir_led(bool on)
 {
+	int32_t ret_val;
 	if (on)
-		return comm_query(params, "SIL ON");
+		ret_val = comm_query(params, "SIL ON");
 	else
-		return comm_query(params, "SIL OFF");
+		ret_val = comm_query(params, "SIL OFF");
+
+	if (ret_val == ERR_NONE)
+		ir_led_value = on;
+
+	return ret_val;
 }
 
-int32_t get_ir_led(bool *on)
+int32_t read_ir_led()
 {
 	int32_t ret_val;
 	char ir_state[16];
@@ -100,40 +156,56 @@ int32_t get_ir_led(bool *on)
 		return ERR_PARAM;
 
 	if (!strncmp(ir_state, "OFF", strlen("OFF")))
-		*on = false;
+		ir_led_value = false;
 	else if (!strncmp(ir_state, "ON", strlen("ON")))
-		*on = true;
+		ir_led_value = true;
 	else
 		return ERR_PARAM;
 
 	return ERR_NONE;
 }
 
-int32_t set_status_led(StatusLedFlashState_t led_state, int32_t flash_rate)
+const bool *get_ir_led()
 {
+	return &ir_led_value;
+}
+
+static int32_t write_led(char *write_command, StatusLedFlashState_t led_state,
+		int32_t flash_rate, led_flash_status_t *flash_status_out)
+{
+	int32_t ret_val;
 	switch (led_state)
 	{
 	case STATUS_LED_OFF:
-		return comm_query(params, "SSL OFF");
+		ret_val = comm_query(params, "%s OFF", write_command);
 		break;
 	case STATUS_LED_ON:
-		return comm_query(params, "SSL ON");
+		ret_val = comm_query(params, "%s ON", write_command);
 		break;
 	case STATUS_LED_FLASH:
-		return comm_query(params, "SSL FLASH %d", flash_rate);
+		ret_val = comm_query(params, "%s FLASH %d", write_command, flash_rate);
 		break;
 	default:
-		return ERR_PARAM;
+		ret_val = ERR_PARAM;
+		break;
 	}
+
+	if (ret_val == ERR_NONE)
+	{
+		flash_status_out->state = led_state;
+		flash_status_out->flash_rate = flash_rate;
+	}
+
+	return ret_val;
 
 }
 
-int32_t get_status_led(StatusLedFlashState_t *led_state, int32_t *flash_rate)
+static int32_t read_led(char *read_command, led_flash_status_t *flash_status)
 {
 	int32_t ret_val;
 	char led_string[16];
 	int32_t flash_rate_temp;
-	ret_val = comm_query(params, "GSL");
+	ret_val = comm_query(params, read_command);
 	if (0 > ret_val)
 		return ret_val;
 
@@ -142,19 +214,19 @@ int32_t get_status_led(StatusLedFlashState_t *led_state, int32_t *flash_rate)
 	{
 		if (!strncmp(led_string, "OFF", strlen("OFF")))
 		{
-			*led_state = STATUS_LED_OFF;
-			*flash_rate = 0;
+			flash_status->state = STATUS_LED_OFF;
+			flash_status->flash_rate = 0;
 		}
 		else if (!strncmp(led_string, "ON", strlen("ON")))
 		{
-			*led_state = STATUS_LED_ON;
-			*flash_rate = 0;
+			flash_status->state = STATUS_LED_ON;
+			flash_status->flash_rate = 0;
 		}
-		else if (!strncmp(led_string, "FLASH", strlen("FLASH")) && (2
-				== ret_val))
+		else if (!strncmp(led_string, "FLASH", strlen("FLASH"))
+				&& (2 == ret_val))
 		{
-			*led_state = STATUS_LED_FLASH;
-			*flash_rate = flash_rate_temp;
+			flash_status->state = STATUS_LED_FLASH;
+			flash_status->flash_rate = flash_rate_temp;
 		}
 		else
 			return ERR_PARAM;
@@ -163,38 +235,87 @@ int32_t get_status_led(StatusLedFlashState_t *led_state, int32_t *flash_rate)
 	return ERR_NONE;
 }
 
-int32_t get_current_time(uint32_t *time)
+int32_t write_status_led(StatusLedFlashState_t led_state, int32_t flash_rate)
+{
+	return write_led("SSL", led_state, flash_rate, &status_led_status);
+}
+
+int32_t read_status_led()
+{
+	return read_led("GSL", &status_led_status);
+}
+
+const led_flash_status_t *get_status_led()
+{
+	return &status_led_status;
+}
+
+int32_t write_error_led(StatusLedFlashState_t led_state, int32_t flash_rate)
+{
+	return write_led("SEL", led_state, flash_rate, &error_led_status);
+}
+
+int32_t read_error_led()
+{
+	return read_led("GEL", &error_led_status);
+}
+
+const led_flash_status_t *get_error_led()
+{
+	return &error_led_status;
+}
+
+int32_t read_current_time()
 {
 	int32_t ret_val;
 	ret_val = comm_query(params, "TIM");
 	if (0 > ret_val)
 		return ret_val;
 
-	ret_val = sscanf(params, "%d", time);
+	int32_t timestamp_temp;
+	ret_val = sscanf(params, "%d", &timestamp_temp);
 	if (ret_val == 1)
+	{
+		timestamp = timestamp_temp;
 		return ERR_NONE;
+	}
 	else
+	{
 		return ERR_PARAM;
+	}
 }
 
-int32_t get_last_error(int32_t *error_id, int32_t *timestamp)
+const uint32_t *get_current_time()
+{
+	return &timestamp;
+}
+
+int32_t read_last_error()
 {
 	int32_t ret_val;
-	char error_id_string[16];
 	ret_val = comm_query(params, "GLE");
 	if (0 > ret_val)
 		return ret_val;
 
-	ret_val = sscanf(params, "%s %d", error_id_string, timestamp);
+	char error_id_string[16];
+	uint32_t error_timestamp;
+
+	ret_val = sscanf(params, "%s %d", error_id_string, &error_timestamp);
 	if (ret_val == 2)
 	{
-		*error_id = decode_error_response(error_id_string);
+		last_error.error_id = decode_error_response(error_id_string);
+		last_error.timestamp = error_timestamp;
 	}
 
 	return ERR_NONE;
 }
 
-int32_t get_program_info(char *pgm_info)
+const error_info_t *get_last_error()
+{
+	return &last_error;
+}
+
+int32_t read_program_info()
 {
 	int32_t ret_val;
 	ret_val = comm_query(params, "PGM");
@@ -214,6 +335,11 @@ int32_t get_program_info(char *pgm_info)
 	return ERR_NONE;
 }
 
+const char *get_program_info()
+{
+	return pgm_info;
+}
+
 int32_t send_password(char *password)
 {
 	return comm_query(params, "ICB %s", password);
@@ -224,63 +350,28 @@ int32_t send_jump_to_boot(void)
 	return comm_query(params, "SDN");
 }
 
-int32_t get_pushbuttons(bool *pressed)
+int32_t shutdown()
 {
-#if PUSHBUTTONS_SUPPORTED
-	int32_t ret_val, i;
-	int32_t button_int[NUMBER_OF_PUSHBUTTONS];
-
-	ret_val = comm_query(params, "GPB");
-	if (0 > ret_val)
-		return ret_val;
-	sscanf(params, "%d %d %d %d %d", &button_int[0], &button_int[1],
-			&button_int[2], &button_int[3], &button_int[4]);
-
-	for (i = 0; i < NUMBER_OF_PUSHBUTTONS; i++)
-		pressed[i] = (button_int[i] != 0);
-
-	return ret_val;
-#else
-	return ERR_NONE;
-#endif
-}
-
-int32_t clear_lcd(void)
-{
-#if LCD_SUPPORTED
-	return comm_query(params, "CLD");
-#else
-	return ERR_NONE;
-#endif
+	return comm_query(params, "SDN");
 }
 
 int32_t set_lcd(int32_t line, char *fmt, ...)
 {
-#if LCD_SUPPORTED
 	va_list args;
-	va_start(args,fmt);
-	vsprintf(lcd_text, fmt, args);
+	va_start(args, fmt);
+	vsprintf(lcd_line_text[line], fmt, args);
 
-	return comm_query(params, "SLD %d \"%s\"", line, lcd_text);
+#if LCD_SUPPORTED
+	return comm_query(params, "SLD %d \"%s\"", line, lcd_line_text[line]);
 #else
+#if _DEBUG
+	printf("SLD %d \"%s\"\n", line, lcd_line_text[line]);
+#endif
 	return ERR_NONE;
 #endif
 }
 
-int32_t lcd_putchars(int32_t line, int32_t ch, char *fmt, ...)
+const char *get_lcd(int32_t line)
 {
-#if LCD_SUPPORTED
-	va_list args;
-	va_start(args,fmt);
-	vsprintf(lcd_text, fmt, args);
-
-	return comm_query(params, "PLC %d %d \"%s\"", line, ch, lcd_text);
-#else
-	return ERR_NONE;
-#endif
-}
-
-int32_t shutdown()
-{
-	return comm_query(params, "SDN");
+	return lcd_line_text[line];
 }

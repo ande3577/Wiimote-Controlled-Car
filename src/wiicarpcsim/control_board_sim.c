@@ -25,41 +25,9 @@ struct window_ref_t *wm;
 
 GtkWidget* error_dialog;
 
-char tx_buffer[256];
-char temp_buffer[256];
-
-char params[256];
-char lcd_line_text[2][256];
-char lcd_text[512];
-bool lcd_changed = true;
-
-int32_t motor_level[NUMBER_OF_MOTOR_CHANNELS] =
-{ 0 };
-bool motor_level_changed = true;
-
-int32_t sensor_values[NUMBER_OF_SENSOR_CHANNELS] =
-{ 0 };
-bool sensor_values_changes = true;
-
-bool ir_led_value = false;
-bool ir_led_changed = true;
-
-StatusLedFlashState_t status_led_flash_state;
-int32_t status_led_flash_rate;
-bool status_led_changed = true;
-
-int32_t motor_timeout;
-bool motor_timeout_changed = true;
-uint32_t timestamp;
-bool timestamp_changed = true;
-
 #define GRAPHIC_UPDATE_DELAY 100
 
-#if _DEBUG
-bool comm_trace = true;
-#else
-bool comm_trace = false;
-#endif
+bool diagnostic_mode = false;
 
 // dummy functions to prevent warnings
 void on_get_button_clicked(GtkObject *object, gpointer wn)
@@ -159,7 +127,7 @@ int32_t comm_close()
 }
 
 
-int32_t set_motor_levels(int32_t channel1, int32_t channel2)
+int32_t write_motor_levels(int32_t channel1, int32_t channel2)
 {
 	motor_level[0] = channel1;
 	motor_level[1] = channel2;
@@ -167,14 +135,14 @@ int32_t set_motor_levels(int32_t channel1, int32_t channel2)
 	return comm_query(params, "SML %d %d", channel1, channel2);
 }
 
-int32_t get_motor_levels(int32_t *channel1, int32_t *channel2)
+int32_t read_motor_levels(int32_t *channel1, int32_t *channel2)
 {
 	*channel1 = motor_level[0];
 	*channel2 = motor_level[1];
 	return comm_query(params, "GML");
 }
 
-int32_t get_sensor_value(int32_t *channel1, int32_t *channel2)
+int32_t read_sensor_values(int32_t *channel1, int32_t *channel2)
 {
 	/// \todo read value from control
 	return comm_query(params, "GSV");;
@@ -187,7 +155,7 @@ int32_t set_motor_timeout(int32_t timeout)
 	return comm_query(params, "SMT %d", timeout);;
 }
 
-int32_t get_motor_timeout(int32_t *timeout)
+int32_t read_motor_timeout(int32_t *timeout)
 {
 	*timeout = motor_timeout;
 	return comm_query(params, "GMT");
@@ -208,13 +176,13 @@ int32_t set_ir_led(bool on)
 		return comm_query(params, "SIL OFF");
 }
 
-int32_t get_ir_led(bool *on)
+int32_t read_ir_led(bool *on)
 {
 	*on = ir_led_value;
 	return comm_query(params, "GIL");
 }
 
-int32_t set_status_led(StatusLedFlashState_t led_state, int32_t flash_rate)
+int32_t write_status_led(StatusLedFlashState_t led_state, int32_t flash_rate)
 {
 	status_led_flash_state = led_state;
 	status_led_flash_rate = flash_rate;
@@ -236,25 +204,25 @@ int32_t set_status_led(StatusLedFlashState_t led_state, int32_t flash_rate)
 	}
 }
 
-int32_t get_status_led(StatusLedFlashState_t *led_state, int32_t *flash_rate)
+int32_t read_status_led(StatusLedFlashState_t *led_state, int32_t *flash_rate)
 {
 	*led_state = status_led_flash_state;
 	*flash_rate = status_led_flash_rate;
 	return comm_query(params, "GSL");
 }
 
-int32_t get_current_time(uint32_t *time)
+int32_t read_current_time(uint32_t *time)
 {
 	*time = get_tick_count();
 	return comm_query(params, "TIM");
 }
 
-int32_t get_last_error(int32_t *error_id, int32_t *timestamp)
+int32_t read_last_error(int32_t *error_id, int32_t *timestamp)
 {
 	return comm_query(params, "GLE");
 }
 
-int32_t get_program_info(char *pgm_info)
+int32_t read_program_info(char *pgm_info)
 {
 	pgm_info = "Controller Board PC Sim";
 	return comm_query(params, "PGM");
@@ -270,7 +238,7 @@ int32_t send_jump_to_boot(void)
 	return comm_query(params, "SDN");
 }
 
-int32_t get_pushbuttons(bool *pressed)
+int32_t read_pushbuttons(bool *pressed)
 {
 	get_pushbuttons_from_control(wm->pushbutton, pressed);
 

@@ -20,12 +20,14 @@
 #include <time.h>
 #include <wiicarutility/timestamp.h>
 #include <wiicarutility/error_message.h>
+#include <wiicarutility/utility.h>
 #include <controlboard/control_board.h>
+#ifdef _PC_SIM
+#include <wiicargui/wiicargui.h>
+#endif
 
 #include "wiicar.h"
 #include "ControlTasks.h"
-
-
 
 cwiid_mesg_callback_t cwiid_callback;
 
@@ -96,13 +98,14 @@ static ErrorID_t signal_wiimote_data_ready(
 int32_t sensor_cutoff_fwd, sensor_cutoff_rev;
 
 cwiid_err_t err;
+
 void err(cwiid_wiimote_t *wiimote, const char *s, va_list ap)
 {
 #if _DEBUG
 	if (wiimote)
-	printf("%d:", cwiid_get_id(wiimote));
+		printf("%d:", cwiid_get_id(wiimote));
 	else
-	printf("-1:");
+		printf("-1:");
 	vprintf(s, ap);
 	printf("\n");
 #endif
@@ -125,39 +128,39 @@ void control_tasks(char *dev_name)
 	pthread_mutex_lock(&mutex);
 #endif
 
+#if _PC_SIM
+	int argc_dummy = 0;
+	char **argv_dummy = NULL;
+	init_gui(argc_dummy, argv_dummy);
+
+	set_comm_trace(true);
+	set_diagnostic_mode(true);
+#else
 	if (0 >= comm_init(dev_name))
 	{
-#if _DEBUG
-		printf("@%u: Cannot initialize %s\n", get_tick_count(), dev_name);
-#endif
+		debug_print("@%u: Cannot initialize %s\n", get_tick_count(), dev_name);
 		exit(4);
 	}
 	else
 	{
-#if _DEBUG
-		printf("@%u: %s initialized.\n", get_tick_count(), dev_name);
-#endif
+		debug_print("@%u: %s initialized.\n", get_tick_count(), dev_name);
 	}
 
 	do
 	{
-#if _DEBUG
-		printf("Connecting to controller board... ");
-#endif
+		debug_print("Connecting to controller board... ");
 		if (0 > send_password("WIFIBOT123"))
 		{
-#if _DEBUG
-			printf("Error\n");
-#endif
+			debug_print("Error\n");
 		}
 		else
 		{
-#if _DEBUG
-			printf("Done\n");
-#endif
+			debug_print("Done\n");
 			break;
 		}
-	} while (1);
+	}while (1);
+
+#endif
 
 	set_lcd(0, "%s", PACKAGE_NAME);
 	set_lcd(1, "Rev: %s", PACKAGE_VERSION);
@@ -174,9 +177,9 @@ void control_tasks(char *dev_name)
 		{
 		case WII_PROMPT:
 			/* Connect to the wiimote */
-#if _DEBUG
-			printf("Put Wiimote in discoverable mode now (press 1+2)...\n");
-#endif
+			debug_print(
+					"Put Wiimote in discoverable mode now (press 1+2)...\n");
+
 			set_lcd(0, "Connecting...");
 			set_lcd(1, "Press 1+2 now");
 			WiimoteState = WII_WAIT_FOR_CONNECTION;
@@ -201,11 +204,12 @@ void control_tasks(char *dev_name)
 		case WII_OPERATE:
 		default:
 			main_menu(wiimote, &wiimote_status_data);
-#if _DEBUG
-			printf("exiting.\n");
-#endif
+			debug_print("exiting.\n");
 #if _MUTEX_ENABLE
 			pthread_mutex_destroy(&mutex);
+#endif
+#if _PC_SIM
+			shutdown_gui();
 #endif
 			exit(0);
 			break;
@@ -238,7 +242,7 @@ ErrorID_t main_menu(cwiid_wiimote_t *wiimote,
 	uint16_t last_button_state = 0;
 	WII_OPERATE_STATE wii_operate_state = WII_OPERATE_INIT_MENU;
 
-	set_status_led(STATUS_LED_OFF, 0);
+	write_status_led(STATUS_LED_OFF, 0);
 
 	for (;;)
 	{
@@ -248,7 +252,7 @@ ErrorID_t main_menu(cwiid_wiimote_t *wiimote,
 			menu_count = 0;
 			last_button_state = 0;
 			wii_operate_state = WII_OPERATE_WAIT_FOR_BUTTON_PRESS;
-			set_status_led(STATUS_LED_FLASH, 500);
+			write_status_led(STATUS_LED_FLASH, 500);
 
 			if (0 > cwiid_set_led(wiimote, CWIID_LED1_ON))
 				return WII_ERROR_TRANSMIT;
@@ -258,9 +262,7 @@ ErrorID_t main_menu(cwiid_wiimote_t *wiimote,
 				return WII_ERROR_TRANSMIT;
 
 			/* Menu */
-#if _DEBUG
-			printf("%s", MENU);
-#endif
+			debug_print("%s", MENU);
 			set_lcd(0, "Connected.");
 			set_lcd(1, "Select Mode.");
 			break;
@@ -377,7 +379,7 @@ ErrorID_t infrared_mode(cwiid_wiimote_t *wiimote,
 
 	WiimoteInfraredStateType state = WIIMOTE_INFRARED_WAIT_FOR_START;
 
-	set_status_led(STATUS_LED_OFF, 0);
+	write_status_led(STATUS_LED_OFF, 0);
 
 	for (;;)
 	{
@@ -397,25 +399,19 @@ ErrorID_t infrared_mode(cwiid_wiimote_t *wiimote,
 
 		case WIIMOTE_INFRARED_ENABLE:
 			set_ir_led(STATUS_LED_ON);
-			/// TODO what do I have to do to enable camera in CWIID?
-			//			IRCameraEnable(&transmit_buffer);
 
-#if _DEBUG
-			printf("Setting IR Report\n");
-#endif
+			debug_print("Setting IR Report\n");
 
 			if (0 < cwiid_set_rpt_mode(wiimote, CWIID_RPT_IR | CWIID_RPT_BTN))
 			{
-#if _DEBUG
-				printf("Cannot set report mode to IR\n");
-#endif
+				debug_print("Cannot set report mode to IR\n");
 				return false;
 			}
 
 			set_lcd(0, "Infrared Mode");
 			set_lcd(1, "Point wiimote at car");
 
-			set_status_led(STATUS_LED_ON, 0);
+			write_status_led(STATUS_LED_ON, 0);
 
 			state = WIIMOTE_INFRARED_READ_DATA;
 			break;
@@ -436,7 +432,7 @@ ErrorID_t infrared_mode(cwiid_wiimote_t *wiimote,
 						&valid_points);
 				if (valid_points != last_valid)
 				{
-					set_status_led(
+					write_status_led(
 							valid_points ? STATUS_LED_OFF : STATUS_LED_ON, 0);
 					set_lcd(
 							1,
@@ -467,12 +463,8 @@ ErrorID_t infrared_mode(cwiid_wiimote_t *wiimote,
 			}
 			break;
 		case WIIMOTE_INFRARED_EXIT:
-			/// TODO need to build commands to send off to motor
-			//		SendMotorCommandStop(&StatusData.MotorDirectionData);
-			/// TODO what do i have to od to disable IR Camera in CWIED
-			//		IRCameraDisable(&transmit_buffer);
 			stop_motors();
-			set_status_led(STATUS_LED_OFF, 0);
+			write_status_led(STATUS_LED_OFF, 0);
 			set_ir_led(false);
 			return error_flag;
 			break;
@@ -505,10 +497,8 @@ ErrorID_t acceleration_mode(cwiid_wiimote_t *wiimote,
 
 	WiimoteAccelStateType state = WIIMOTE_ACCEL_WAIT_FOR_START;
 
-#if _DEBUG
-	printf("Entering acceleration mode...\n");
-#endif
-	set_status_led(STATUS_LED_OFF, 0);
+	debug_print("Entering acceleration mode...\n");
+	write_status_led(STATUS_LED_OFF, 0);
 
 	for (;;)
 	{
@@ -517,9 +507,7 @@ ErrorID_t acceleration_mode(cwiid_wiimote_t *wiimote,
 		case WIIMOTE_ACCEL_WAIT_FOR_START:
 			if (0 > wait_for_wiimotedata(wiimote_status, INFINITE_TIMEOUT))
 			{
-#if _DEBUG
-				printf("No start signal received\n");
-#endif
+				debug_print("No start signal received\n");
 				error_flag = WII_ERROR_DATA_TIMEOUT;
 				state = WIIMOTE_ACCEL_EXIT;
 			}
@@ -546,17 +534,13 @@ ErrorID_t acceleration_mode(cwiid_wiimote_t *wiimote,
 
 			if (error_flag != ERR_NONE)
 			{
-#if _DEBUG
-				printf("Cannot read cal data\n");
-#endif
+				debug_print("Cannot read cal data\n");
 				return error_flag;
 			}
 
 			if (0 > cwiid_set_rpt_mode(wiimote, CWIID_RPT_ACC | CWIID_RPT_BTN))
 			{
-#if _DEBUG
-				printf("Cannot set report mode to ACCEL\n");
-#endif
+				debug_print("Cannot set report mode to ACCEL\n");
 				return false;
 			}
 
@@ -568,9 +552,7 @@ ErrorID_t acceleration_mode(cwiid_wiimote_t *wiimote,
 		case WIIMOTE_ACCEL_READ_DATA:
 			if (0 > wait_for_wiimotedata(wiimote_status, INFINITE_TIMEOUT))
 			{
-#if _DEBUG
-				printf("@%u: WII_ERROR_DATA_TIMEOUT\n", get_tick_count());
-#endif
+				debug_print("@%u: WII_ERROR_DATA_TIMEOUT\n", get_tick_count());
 				error_flag = WII_ERROR_DATA_TIMEOUT;
 				state = WIIMOTE_ACCEL_EXIT;
 			}
@@ -594,9 +576,8 @@ ErrorID_t acceleration_mode(cwiid_wiimote_t *wiimote,
 						cwiid_set_rumble(wiimote, false);
 						if (error_flag < 0)
 						{
-#if _DEBUG
-							printf("@%u: CONTROL CAR COMM ERROR: %d\n", get_tick_count(), error_flag);
-#endif
+							debug_print("@%u: CONTROL CAR COMM ERROR: %d\n",
+									get_tick_count(), error_flag);
 							state = WIIMOTE_ACCEL_EXIT;
 						}
 					}
@@ -619,9 +600,7 @@ ErrorID_t acceleration_mode(cwiid_wiimote_t *wiimote,
 			}
 			break;
 		case WIIMOTE_ACCEL_EXIT:
-#if _DEBUG
-			printf("Exiting acceleration mode.\n\n");
-#endif
+			debug_print("Exiting acceleration mode.\n\n");
 			return error_flag;
 		}
 	}
@@ -637,10 +616,8 @@ ErrorID_t button_mode(cwiid_wiimote_t *wiimote,
 
 	cwiid_set_rpt_mode(wiimote, CWIID_RPT_BTN);
 
-#if _DEBUG
-	printf("Entering button mode:\n");
-#endif
-	set_status_led(STATUS_LED_OFF, 0);
+	debug_print("Entering button mode:\n");
+	write_status_led(STATUS_LED_OFF, 0);
 
 	set_lcd(0, "Button Mode");
 	set_lcd(1, "2-fwd,1-back,dpad-steer");
@@ -699,11 +676,10 @@ ErrorID_t button_mode(cwiid_wiimote_t *wiimote,
 		else
 			direction = 0;
 
-#if _DEBUG
-		printf("@%u: Button (speed, heading) = %d %d\n", get_tick_count(), speed, direction);
-#endif
+		debug_print("@%u: Button (speed, heading) = %d %d\n", get_tick_count(),
+				speed, direction);
 
-		set_motor_levels(speed, ComputeDirectionMotor(direction));
+		write_motor_levels(speed, ComputeDirectionMotor(direction));
 	} while (run);
 	return ERR_NONE;
 }
@@ -712,7 +688,7 @@ int32_t shutdown_all(cwiid_wiimote_t *wiimote)
 {
 	stop_motors();
 	set_ir_led(false);
-	set_status_led(STATUS_LED_OFF, 0);
+	write_status_led(STATUS_LED_OFF, 0);
 	return cwiid_close(wiimote);
 }
 
@@ -733,7 +709,7 @@ void cwiid_callback(cwiid_wiimote_t *wiimote, int mesg_count,
 	int valid_source;
 
 #if _DEBUG >= 2
-	printf("@%u: msg received\n",get_tick_count());
+	debug_print("@%u: msg received\n",get_tick_count());
 #endif
 
 	for (i = 0; i < mesg_count; i++)
@@ -742,7 +718,7 @@ void cwiid_callback(cwiid_wiimote_t *wiimote, int mesg_count,
 		{
 		case CWIID_MESG_STATUS:
 #if _DEBUG >= 2
-			printf("@%u: Status Report: battery=%d extension=", get_tick_count(),
+			debug_print("@%u: Status Report: battery=%d extension=", get_tick_count(),
 					mesg[i].status_mesg.battery);
 #endif
 			wiimote_status_data.battery_level = mesg[i].status_mesg.battery;
@@ -750,36 +726,36 @@ void cwiid_callback(cwiid_wiimote_t *wiimote, int mesg_count,
 			{
 			case CWIID_EXT_NONE:
 #if _DEBUG >= 2
-				printf("none\n");
+				debug_print("none\n");
 #endif
 				break;
 			case CWIID_EXT_NUNCHUK:
 #if _DEBUG >= 2
-				printf("Nunchuk\n");
+				debug_print("Nunchuk\n");
 #endif
 				break;
 			case CWIID_EXT_CLASSIC:
 #if _DEBUG >= 2
-				printf("Classic Controller\n");
+				debug_print("Classic Controller\n");
 #endif
 				break;
 			default:
 #if _DEBUG >= 2
-				printf("Unknown Extension\n");
+				debug_print("Unknown Extension\n");
 #endif
 				break;
 			}
 			break;
 		case CWIID_MESG_BTN:
 #if _DEBUG >= 2
-			printf("@%u: Button Report: %.4X\n", get_tick_count(), mesg[i].btn_mesg.buttons);
+			debug_print("@%u: Button Report: %.4X\n", get_tick_count(), mesg[i].btn_mesg.buttons);
 #endif
 			wiimote_status_data.button_data = mesg[i].btn_mesg.buttons;
 
 			break;
 		case CWIID_MESG_ACC:
 #if _DEBUG >= 2
-			printf("@%u: Acc Report: x=%d, y=%d, z=%d\n", get_tick_count(),
+			debug_print("@%u: Acc Report: x=%d, y=%d, z=%d\n", get_tick_count(),
 					mesg[i].acc_mesg.acc[CWIID_X],
 					mesg[i].acc_mesg.acc[CWIID_Y],
 					mesg[i].acc_mesg.acc[CWIID_Z]);
@@ -791,7 +767,7 @@ void cwiid_callback(cwiid_wiimote_t *wiimote, int mesg_count,
 			break;
 		case CWIID_MESG_IR:
 #if _DEBUG >= 2
-			printf("@%u: IR Report: ", get_tick_count());
+			debug_print("@%u: IR Report: ", get_tick_count());
 #endif
 			valid_source = 0;
 			for (j = 0; j < CWIID_IR_SRC_COUNT; j++)
@@ -800,7 +776,7 @@ void cwiid_callback(cwiid_wiimote_t *wiimote, int mesg_count,
 				if (mesg[i].ir_mesg.src[j].valid)
 				{
 					valid_source = 1;
-					printf("(%d,%d) ", mesg[i].ir_mesg.src[j].pos[CWIID_X],
+					debug_print("(%d,%d) ", mesg[i].ir_mesg.src[j].pos[CWIID_X],
 							mesg[i].ir_mesg.src[j].pos[CWIID_Y]);
 
 				}
@@ -817,14 +793,14 @@ void cwiid_callback(cwiid_wiimote_t *wiimote, int mesg_count,
 #if _DEBUG >= 2
 			if (!valid_source)
 			{
-				printf("@%u: no sources detected", get_tick_count());
+				debug_print("@%u: no sources detected", get_tick_count());
 			}
 			printf("\n");
 #endif
 			break;
 		case CWIID_MESG_NUNCHUK:
 #if _DEBUG >= 2
-			printf("@%u: Nunchuk Report: btns=%.2X stick=(%d,%d) acc.x=%d acc.y=%d "
+			debug_print("@%u: Nunchuk Report: btns=%.2X stick=(%d,%d) acc.x=%d acc.y=%d "
 					"acc.z=%d\n", get_tick_count(), mesg[i].nunchuk_mesg.buttons,
 					mesg[i].nunchuk_mesg.stick[CWIID_X],
 					mesg[i].nunchuk_mesg.stick[CWIID_Y],
@@ -835,7 +811,7 @@ void cwiid_callback(cwiid_wiimote_t *wiimote, int mesg_count,
 			break;
 		case CWIID_MESG_CLASSIC:
 #if _DEBUG >= 2
-			printf("@%u: Classic Report: btns=%.4X l_stick=(%d,%d) r_stick=(%d,%d) "
+			debug_print("@%u: Classic Report: btns=%.4X l_stick=(%d,%d) r_stick=(%d,%d) "
 					"l=%d r=%d\n", get_tick_count(), mesg[i].classic_mesg.buttons,
 					mesg[i].classic_mesg.l_stick[CWIID_X],
 					mesg[i].classic_mesg.l_stick[CWIID_Y],
@@ -856,7 +832,7 @@ void cwiid_callback(cwiid_wiimote_t *wiimote, int mesg_count,
 			break;
 		default:
 #if _DEBUG > 2
-			printf("@%u: Unknown Report", get_tick_count());
+			debug_print("@%u: Unknown Report", get_tick_count());
 #endif
 			break;
 		}
@@ -917,9 +893,8 @@ ErrorID_t wait_for_wiimotedata(volatile WiimoteStatusDataType *wiimote_status,
 	{
 		if (check_for_timeout(get_tick_count(), start_time, timeout))
 		{
-#if _DEBUG
-			printf("%u: wiimote data timeout, timeout = %d\n", get_tick_count(), timeout);
-#endif
+			debug_print("%u: wiimote data timeout, timeout = %d\n",
+					get_tick_count(), timeout);
 			return ERR_WII_DATA_TIMEOUT;
 		}
 
@@ -939,7 +914,7 @@ int32_t signal_wiimote_data_ready(
 	return ret_val;
 	return pthread_mutex_unlock(&mutex);
 #if _DEBUG >= 2
-	printf("@%u: Wiimote data received\n", get_tick_count());
+	debug_print("@%u: Wiimote data received\n", get_tick_count());
 #endif
 	return ret_val;
 #else
@@ -951,9 +926,7 @@ int32_t signal_wiimote_data_ready(
 ErrorID_t error_mode(cwiid_wiimote_t *wiimote,
 		volatile WiimoteStatusDataType *wiimote_status)
 {
-#if _DEBUG
-	printf("@%u: An error has occurred\n", get_tick_count());
-#endif
+	debug_print("@%u: An error has occurred\n", get_tick_count());
 	shutdown_all(wiimote);
 	exit(-1);
 }

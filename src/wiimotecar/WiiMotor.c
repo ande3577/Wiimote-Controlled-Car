@@ -18,7 +18,7 @@
 
 int32_t stop_motors(void)
 {
-	return set_motor_levels(SPEED_NULL_VALUE, DIRECTION_NULL_VALUE);
+	return write_motor_levels(SPEED_NULL_VALUE, DIRECTION_NULL_VALUE);
 }
 
 /*!
@@ -66,7 +66,7 @@ int32_t computer_motor_levels_accel(
 			WIICAR_ACCEL_SCALING_VALUE, DIRECTION_NULL_VALUE,
 			MIN_DIRECTION_MOTOR, MAX_DIRECTION_MOTOR);
 
-	return set_motor_levels(speed, direction);
+	return write_motor_levels(speed, direction);
 }
 
 /*!
@@ -149,7 +149,7 @@ int32_t WiiComputeMotorLevelsInfrared(
 			speed = (distance * MAX_FORWARD_SPEED) / MAX_IR_DISTANCE;
 		}
 		direction = ComputeDirectionMotor(direction);
-		return set_motor_levels(speed, direction);
+		return write_motor_levels(speed, direction);
 	}
 }
 

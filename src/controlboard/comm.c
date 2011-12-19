@@ -21,28 +21,19 @@
 
 int32_t fd; // file descriptor for the port
 
-#if _DEBUG
-bool comm_trace = true;
-#else
 bool comm_trace = false;
-#endif
+bool diagnostic_mode = false;
 
 char tx_buffer[256];
 char rx_buffer[256];
 
-bool get_comm_trace(void)
-{
-	return comm_trace;
-}
-
-void set_comm_trace(bool enabled)
-{
-	comm_trace = enabled;
-}
+static int32_t comm_writeline(char *buffer);
+static int32_t comm_readline(char *bfr, int32_t count);
+static int32_t comm_validate_response(char *response, char *cmd,
+		char *parameters);
 
 int open_port(char *name)
 {
-#if !_DIAGNOSTIC_MODE
 	fd = open(name, O_RDWR | O_NOCTTY | O_NDELAY);
 	if (fd == -1)
 	{
@@ -56,14 +47,10 @@ int open_port(char *name)
 		fcntl(fd, F_SETFL, 0);
 
 	return (fd);
-#else
-	return 1;
-#endif
 }
 
 int initport(int fd)
 {
-#if !_DIAGNOSTIC_MODE
 	struct termios options;
 	// Get the current options for the port...
 	tcgetattr(fd, &options);
@@ -92,35 +79,25 @@ int initport(int fd)
 	tcsetattr(fd, TCSANOW, &options);
 	fd = 1;
 	return fd;
-#else
-	return 1;
-#endif
 }
 
 int32_t comm_init(char *port_name)
 {
-#if !_DIAGNOSTIC_MODE
+	if (diagnostic_mode)
+		return 0;
+
 	fd = open_port(port_name);
 	if (0 < fd)
 		initport(fd);
 	return fd;
-#else
-	return 1;
-#endif
 }
 
 int32_t comm_close(void)
 {
-#if !_DIAGNOSTIC_MODE
-	return close(fd);
-#else
-	return 0;
-#endif
-}
-
-int32_t comm_flush()
-{
-	return tcflush(fd, TCIOFLUSH);
+	if (diagnostic_mode)
+		return 0;
+	else
+		return close(fd);
 }
 
 int32_t comm_readline(char *bfr, int32_t count)
@@ -192,6 +169,8 @@ int32_t comm_validate_response(char *response, char *send, char *parameters)
 
 int32_t comm_query(char *parameters, const char *fmt, ...)
 {
+	if (diagnostic_mode)
+		return ERR_NONE;
 
 	int32_t ret_val;
 	va_list args;
@@ -203,7 +182,6 @@ int32_t comm_query(char *parameters, const char *fmt, ...)
 	if (comm_trace)
 		printf("@%u: << %s\n", get_tick_count(), tx_buffer);
 
-#if !_DIAGNOSTIC_MODE
 	ret_val = comm_writeline(tx_buffer);
 	if (0 >= ret_val)
 		return ERR_WRITE;
@@ -220,11 +198,28 @@ int32_t comm_query(char *parameters, const char *fmt, ...)
 		printf("@%u: >> %s", get_tick_count(), rx_buffer);
 
 	return comm_validate_response(rx_buffer, tx_buffer, parameters);
-#else
-	printf("%s\n", tx_buffer);
-	return ERR_NONE;
+}
 
-#endif
+bool get_comm_trace(void)
+{
+	return comm_trace;
+}
 
+void set_comm_trace(bool enabled)
+{
+	comm_trace = enabled;
+}
+
+bool get_diagnostic_mode()
+{
+	return diagnostic_mode;
+}
+
+void set_diagnostic_mode(bool enabled)
+{
+	if (!diagnostic_mode)
+		comm_close();
+
+	diagnostic_mode = enabled;
 }
 

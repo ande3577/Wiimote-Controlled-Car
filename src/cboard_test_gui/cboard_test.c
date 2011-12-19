@@ -79,7 +79,7 @@ void on_get_button_clicked(GtkObject *object, gpointer wn)
 	if (ERR_NONE == error_code)
 	{
 		uint32_t timestamp;
-		error_code = get_current_time(&timestamp);
+		error_code = read_current_time(&timestamp);
 		if (ERR_NONE == error_code)
 			draw_current_time(wm->timestamp_control, timestamp);
 	}
@@ -87,7 +87,7 @@ void on_get_button_clicked(GtkObject *object, gpointer wn)
 	if (ERR_NONE == error_code)
 	{
 		char program_info[64] = "";
-		error_code = get_program_info(program_info);
+		error_code = read_program_info(program_info);
 		if (ERR_NONE == error_code)
 			draw_program_info(wm->program_info_control, program_info);
 	}
@@ -95,7 +95,7 @@ void on_get_button_clicked(GtkObject *object, gpointer wn)
 	if (ERR_NONE == error_code)
 	{
 		int32_t motor_levels[NUMBER_OF_MOTOR_CHANNELS];
-		error_code = get_motor_levels(&motor_levels[MOTOR_SPEED_CHANNEL],
+		error_code = read_motor_levels(&motor_levels[MOTOR_SPEED_CHANNEL],
 				&motor_levels[MOTOR_DIRECTION_CHANNEL]);
 
 		if (ERR_NONE == error_code)
@@ -110,7 +110,7 @@ void on_get_button_clicked(GtkObject *object, gpointer wn)
 	if (ERR_NONE == error_code)
 	{
 		int32_t sensor_levels[NUMBER_OF_SENSOR_CHANNELS];
-		error_code = get_sensor_value(&sensor_levels[SENSOR_FWD],
+		error_code = read_sensor_values(&sensor_levels[SENSOR_FWD],
 				&sensor_levels[SENSOR_REV]);
 
 		if (ERR_NONE == error_code)
@@ -122,7 +122,7 @@ void on_get_button_clicked(GtkObject *object, gpointer wn)
 		StatusLedFlashState_t led_state;
 		int32_t flash_rate;
 
-		error_code = get_status_led(&led_state, &flash_rate);
+		error_code = read_status_led(&led_state, &flash_rate);
 
 		if (ERR_NONE == error_code)
 			update_led_control(wm->status_led_control, led_state, flash_rate);
@@ -132,7 +132,7 @@ void on_get_button_clicked(GtkObject *object, gpointer wn)
 	{
 		int32_t motor_timeout;
 
-		error_code = get_motor_timeout(&motor_timeout);
+		error_code = read_motor_timeout(&motor_timeout);
 		if (ERR_NONE == error_code)
 			draw_motor_timeout(wm->motor_timeout_control, motor_timeout);
 	}
@@ -140,7 +140,7 @@ void on_get_button_clicked(GtkObject *object, gpointer wn)
 	if (ERR_NONE == error_code)
 	{
 		bool on;
-		error_code = get_ir_led(&on);
+		error_code = read_ir_led(&on);
 		if (ERR_NONE == error_code)
 			draw_ir_led(wm->ir_led_control, on);
 	}
@@ -148,7 +148,7 @@ void on_get_button_clicked(GtkObject *object, gpointer wn)
 	if (ERR_NONE == error_code)
 	{
 		int32_t error_id, error_timestamp;
-		error_code = get_last_error(&error_id, &error_timestamp);
+		error_code = read_last_error(&error_id, &error_timestamp);
 		if (ERR_NONE == error_code)
 			draw_error_info(wm->error_code, wm->error_timestamp, error_id,
 					error_timestamp);
@@ -157,12 +157,10 @@ void on_get_button_clicked(GtkObject *object, gpointer wn)
 	if (ERR_NONE == error_code)
 	{
 		bool pressed[NUMBER_OF_PUSHBUTTONS];
-		error_code = get_pushbuttons(pressed);
+		error_code = read_pushbuttons(pressed);
 		if (ERR_NONE == error_code)
 			draw_pushbuttons(wm->pushbutton, pressed);
 	}
-
-	/// TODO need handling for error led here (not implemented on control board)
 
 	comm_close();
 
@@ -188,7 +186,7 @@ void on_set_button_clicked(GtkObject *object, gpointer wn)
 				wm->left_motor_slide);
 		motor_levels[MOTOR_DIRECTION_CHANNEL] = get_motor_value_from_control(
 				wm->right_motor_slide);
-		error_code = set_motor_levels(motor_levels[MOTOR_SPEED_CHANNEL],
+		error_code = write_motor_levels(motor_levels[MOTOR_SPEED_CHANNEL],
 				motor_levels[MOTOR_DIRECTION_CHANNEL]);
 	}
 
@@ -210,7 +208,7 @@ void on_set_button_clicked(GtkObject *object, gpointer wn)
 
 		get_led_state_from_control(wm->status_led_control, &flash_state,
 				&flash_rate);
-		set_status_led(flash_state, flash_rate);
+		write_status_led(flash_state, flash_rate);
 	}
 
 	if (ERR_NONE == error_code)
@@ -223,8 +221,6 @@ void on_set_button_clicked(GtkObject *object, gpointer wn)
 		}
 
 	}
-
-	/// TODO need handling for error led here (not implemented on control board)
 
 	comm_close();
 

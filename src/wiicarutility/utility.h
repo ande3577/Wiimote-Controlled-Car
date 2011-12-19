@@ -15,4 +15,6 @@ extern int32_t rescale_range(int32_t x, int32_t null_x, int32_t min_x,
 
 extern int32_t coerce(int32_t x, int32_t min, int32_t max);
 
+void debug_print(const char *fmt, ...);
+
 #endif /* UTILITY_H_ */

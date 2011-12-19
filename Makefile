@@ -22,6 +22,8 @@ include $(TOPDIR)/rules.mk
 PKG_NAME:=cwiimotecar
 PKG_RELEASE:=1
 
+CONFIGURE_ARGS += \
+	--no-gtk
 
 # This specifies the directory where we're going to build the program.  
 # The root build directory, $(BUILD_DIR), is by default the build_mipsel 

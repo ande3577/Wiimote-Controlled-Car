@@ -36,6 +36,8 @@ build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
 bin_PROGRAMS = wiimotecarapp$(EXEEXT)
+@HAVE_GTK_TRUE@am__append_1 = -export-dynamic `pkg-config --cflags --libs gtk+-2.0`
+@HAVE_GTK_TRUE@am__append_2 = ../wiicargui/libwiicargui.la
 subdir = wiimotecar
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -54,7 +56,7 @@ am_wiimotecarapp_OBJECTS = ControlTasks.$(OBJEXT) main.$(OBJEXT) \
 	wiicar_math.$(OBJEXT) WiiMotor.$(OBJEXT)
 wiimotecarapp_OBJECTS = $(am_wiimotecarapp_OBJECTS)
 wiimotecarapp_DEPENDENCIES = ../controlboard/libcontrolboard.la \
-	../wiicarutility/libwiicarutility.la
+	../wiicarutility/libwiicarutility.la $(am__append_2)
 wiimotecarapp_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(wiimotecarapp_LDFLAGS) $(LDFLAGS) -o $@
@@ -104,6 +106,8 @@ EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
 GREP = @GREP@
+GTK_CFLAGS = @GTK_CFLAGS@
+GTK_LIBS = @GTK_LIBS@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -133,6 +137,9 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PKG_CONFIG = @PKG_CONFIG@
+PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
+PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
 RANLIB = @RANLIB@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
@@ -197,8 +204,10 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 wiimotecarapp_SOURCES = ControlTasks.c main.c wiicar_math.c WiiMotor.c
-wiimotecarapp_LDADD = ../controlboard/libcontrolboard.la ../wiicarutility/libwiicarutility.la
-AM_CPPFLAGS = -I ../
+wiimotecarapp_LDADD = ../controlboard/libcontrolboard.la \
+	../wiicarutility/libwiicarutility.la $(am__append_2)
+AM_CPPFLAGS = -I ../ $(am__append_1)
+@HAVE_GTK_TRUE@AM_LDFLAGS = -export-dynamic `pkg-config --cflags --libs gtk+-2.0`
 
 #this has to be added here for OpenWRT, since AC_SEARCH_LIBS not working
 wiimotecarapp_LDFLAGS = -lm -lcwiid -lbluetooth

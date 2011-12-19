@@ -36,7 +36,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-subdir = wiicarutility
+subdir = wiicargui
 DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -72,10 +72,10 @@ am__base_list = \
   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
-libwiicarutility_la_LIBADD =
-am_libwiicarutility_la_OBJECTS = error_message.lo timestamp.lo \
-	utility.lo
-libwiicarutility_la_OBJECTS = $(am_libwiicarutility_la_OBJECTS)
+libwiicargui_la_DEPENDENCIES = ../controlboard/libcontrolboard.la \
+	../wiicarutility/libwiicarutility.la
+am_libwiicargui_la_OBJECTS = wiicargui.lo
+libwiicargui_la_OBJECTS = $(am_libwiicargui_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -89,8 +89,8 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(libwiicarutility_la_SOURCES)
-DIST_SOURCES = $(libwiicarutility_la_SOURCES)
+SOURCES = $(libwiicargui_la_SOURCES)
+DIST_SOURCES = $(libwiicargui_la_SOURCES)
 HEADERS = $(include_HEADERS)
 ETAGS = etags
 CTAGS = ctags
@@ -220,9 +220,12 @@ target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-lib_LTLIBRARIES = libwiicarutility.la
-libwiicarutility_la_SOURCES = error_message.c timestamp.c utility.c
-include_HEADERS = error_message.h timestamp.h utility.h
+lib_LTLIBRARIES = libwiicargui.la
+libwiicargui_la_SOURCES = wiicargui.c
+include_HEADERS = wiicargui.h
+libwiicargui_la_LIBADD = ../controlboard/libcontrolboard.la ../wiicarutility/libwiicarutility.la
+AM_CPPFLAGS = -I ../ -export-dynamic `pkg-config --cflags --libs gtk+-2.0`
+AM_LDFLAGS = -export-dynamic `pkg-config --cflags --libs gtk+-2.0`
 all: all-am
 
 .SUFFIXES:
@@ -236,9 +239,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu wiicarutility/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu wiicargui/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu wiicarutility/Makefile
+	  $(AUTOMAKE) --gnu wiicargui/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -288,8 +291,8 @@ clean-libLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-libwiicarutility.la: $(libwiicarutility_la_OBJECTS) $(libwiicarutility_la_DEPENDENCIES) 
-	$(LINK) -rpath $(libdir) $(libwiicarutility_la_OBJECTS) $(libwiicarutility_la_LIBADD) $(LIBS)
+libwiicargui.la: $(libwiicargui_la_OBJECTS) $(libwiicargui_la_DEPENDENCIES) 
+	$(LINK) -rpath $(libdir) $(libwiicargui_la_OBJECTS) $(libwiicargui_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -297,9 +300,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/error_message.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timestamp.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utility.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wiicargui.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

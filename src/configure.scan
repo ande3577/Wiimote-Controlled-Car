@@ -17,6 +17,12 @@ AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
 # Checks for libraries.
+# FIXME: Replace `main' with a function in `-lbluetooth':
+AC_CHECK_LIB([bluetooth], [main])
+# FIXME: Replace `main' with a function in `-lcwiid':
+AC_CHECK_LIB([cwiid], [main])
+# FIXME: Replace `main' with a function in `-lm':
+AC_CHECK_LIB([m], [main])
 
 # Checks for header files.
 AC_CHECK_HEADERS([fcntl.h stddef.h stdint.h stdlib.h string.h sys/time.h termios.h unistd.h])
@@ -35,6 +41,7 @@ AC_CHECK_FUNCS([clock_gettime gettimeofday sqrt])
 
 AC_CONFIG_FILES([Makefile
                  controlboard/Makefile
+                 wiicargui/Makefile
                  wiicarutility/Makefile
                  wiimotecar/Makefile])
 AC_OUTPUT

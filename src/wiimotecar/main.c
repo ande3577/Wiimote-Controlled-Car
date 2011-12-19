@@ -3,6 +3,7 @@
  *****************/
 #include <stdio.h>
 #include <unistd.h>
+#include <stdbool.h>
 
 #include "ControlTasks.h"
 
@@ -13,11 +14,12 @@
 int main(int argc, char **argv) {
 	char *dev_name;
 
+#if _PC_SIM
+
+#endif
+
 #if _DEBUG
 	printf("\n%s\n", PACKAGE_NAME);
-#if _DIAGNOSTIC_MODE
-	printf("Diagnostic Mode\n");
-#endif
 	printf("Version: %s\n",PACKAGE_VERSION);
 	printf("Built with: GCC, version; %s\n", __VERSION__);
 	printf("On: %s, %s\n",__DATE__,__TIME__);
