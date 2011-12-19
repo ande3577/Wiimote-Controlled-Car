@@ -747,25 +747,8 @@ void init_gui(int argc, char *argv[])
 	wm.pushbutton[JOY_RIGHT] = GTK_CHECK_BUTTON(gtk_builder_get_object(builder,
 					"joy_right_button"));
 
-#if !PUSHBUTTONS_SUPPORTED
-	{
-		uint8_t i;
-		for (i = 0; i < NUMBER_OF_PUSHBUTTONS; i++)
-			gtk_widget_set_sensitive(GTK_WIDGET(wm.pushbutton[i]), false);
-	}
-#endif
-
-#if !LCD_SUPPORTED
-//	gtk_widget_set_sensitive(GTK_WIDGET(wm.lcd_text), false);
-//	gtk_widget_set_sensitive(GTK_WIDGET(wm.clear_lcd_button), false);
-#endif
-
 	wm.lcd_text = GTK_TEXT_VIEW(gtk_builder_get_object(builder,
 					"lcd_text"));
-
-#if !LCD_SUPPORTED
-
-#endif
 
 	wm.com_port = GTK_COMBO_BOX(gtk_builder_get_object(builder,"com_port"));
 	wm.com_port_list =
