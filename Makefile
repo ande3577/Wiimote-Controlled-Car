@@ -1,5 +1,5 @@
 ##############################################
-# OpenWrt Makefile for helloworld program
+# OpenWrt Makefile for cwiimotecar program
 #
 #
 # Most of the variables used here are defined in
