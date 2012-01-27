@@ -8,8 +8,8 @@
 
 #include "ControlTasks.h"
 
-//#define PORT_NAME "/dev/ttyUSB0"
-#define PORT_NAME "/dev/ttyS0"
+#define PORT_NAME "/dev/ttyUSB0"
+//#define PORT_NAME "/dev/ttyS0"
 //#define PORT_NAME "/dev/rfcomm0"
 
 int main(int argc, char **argv)

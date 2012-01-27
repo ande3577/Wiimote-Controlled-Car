@@ -31,7 +31,6 @@
 #include "wiicar.h"
 #include "ControlTasks.h"
 
-
 cwiid_mesg_callback_t cwiid_callback;
 
 cwiid_wiimote_t *wiimote = NULL;
@@ -136,10 +135,13 @@ void control_tasks(char *dev_name)
 	int argc_dummy = 0;
 	char **argv_dummy = NULL;
 	init_gui(argc_dummy, argv_dummy);
+#endif
 
+#if _DEBUG
 	set_comm_trace(true);
-	set_diagnostic_mode(true);
-#else
+#endif
+
+#if !DIAGNOSTIC_MODE
 	if (0 >= comm_init(dev_name))
 	{
 		debug_print("@%u: Cannot initialize %s\n", get_tick_count(), dev_name);
@@ -162,8 +164,9 @@ void control_tasks(char *dev_name)
 			debug_print("Done\n");
 			break;
 		}
-	}while (1);
-
+	} while (1);
+#else
+	set_diagnostic_mode(true);
 #endif
 
 	set_lcd(0, "%s", PACKAGE_NAME);
