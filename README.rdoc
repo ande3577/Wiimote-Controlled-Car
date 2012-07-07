@@ -33,6 +33,12 @@ To download into router:
     cd to <OpenWRT directory>/bin/brcm47xx/packages
     ssh into router: ssh root@192.168.1.1
     install package: ipkg install cwiimotecar_1_brcm47xx.ipk
+
+== Development instructions
+
+In order to create a PC-base build, run the file autogen_debug.sh located in the src directory.  
+Running ./configure and make will build a linux-PC based version that can be used for 
+development/testing.
 	
 == Usage instructions
 
