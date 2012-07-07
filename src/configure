@@ -754,8 +754,6 @@ PKG_CONFIG_PATH
 PKG_CONFIG
 HAVE_GTK_FALSE
 HAVE_GTK_TRUE
-TARGET_IS_PC_FALSE
-TARGET_IS_PC_TRUE
 CXXCPP
 OTOOL64
 OTOOL
@@ -5639,13 +5637,13 @@ if test "${lt_cv_nm_interface+set}" = set; then :
 else
   lt_cv_nm_interface="BSD nm"
   echo "int some_variable = 0;" > conftest.$ac_ext
-  (eval echo "\"\$as_me:5642: $ac_compile\"" >&5)
+  (eval echo "\"\$as_me:5640: $ac_compile\"" >&5)
   (eval "$ac_compile" 2>conftest.err)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:5645: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
+  (eval echo "\"\$as_me:5643: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
   (eval "$NM \"conftest.$ac_objext\"" 2>conftest.err > conftest.out)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:5648: output\"" >&5)
+  (eval echo "\"\$as_me:5646: output\"" >&5)
   cat conftest.out >&5
   if $GREP 'External.*some_variable' conftest.out > /dev/null; then
     lt_cv_nm_interface="MS dumpbin"
@@ -6840,7 +6838,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 6843 "configure"' > conftest.$ac_ext
+  echo '#line 6841 "configure"' > conftest.$ac_ext
   if { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_compile\""; } >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -8759,11 +8757,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8762: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8760: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8766: \$? = $ac_status" >&5
+   echo "$as_me:8764: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -9098,11 +9096,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9101: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9099: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:9105: \$? = $ac_status" >&5
+   echo "$as_me:9103: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -9203,11 +9201,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9206: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9204: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9210: \$? = $ac_status" >&5
+   echo "$as_me:9208: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9258,11 +9256,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9261: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9259: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9265: \$? = $ac_status" >&5
+   echo "$as_me:9263: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -11642,7 +11640,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11645 "configure"
+#line 11643 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11738,7 +11736,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11741 "configure"
+#line 11739 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13694,11 +13692,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13697: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13695: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13701: \$? = $ac_status" >&5
+   echo "$as_me:13699: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -13793,11 +13791,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13796: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13794: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13800: \$? = $ac_status" >&5
+   echo "$as_me:13798: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -13845,11 +13843,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13848: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13846: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13852: \$? = $ac_status" >&5
+   echo "$as_me:13850: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14814,19 +14812,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-case $target in
-	*-*-mipsel*)
-		 if false; then
-  TARGET_IS_PC_TRUE=
-  TARGET_IS_PC_FALSE='#'
-else
-  TARGET_IS_PC_TRUE='#'
-  TARGET_IS_PC_FALSE=
-fi
-
-		# Checks for libraries.
-		# in OpenWRT this check will fail
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for pthread_create in -lpthread" >&5
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for pthread_create in -lpthread" >&5
 $as_echo_n "checking for pthread_create in -lpthread... " >&6; }
 if test "${ac_cv_lib_pthread_pthread_create+set}" = set; then :
   $as_echo_n "(cached) " >&6
@@ -14873,7 +14859,7 @@ else
   as_fn_error $? "pthread library not found" "$LINENO" 5
 fi
 
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for hci_devid in -lbluetooth" >&5
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for hci_devid in -lbluetooth" >&5
 $as_echo_n "checking for hci_devid in -lbluetooth... " >&6; }
 if test "${ac_cv_lib_bluetooth_hci_devid+set}" = set; then :
   $as_echo_n "(cached) " >&6
@@ -14920,54 +14906,9 @@ else
   as_fn_error $? "bluetooth library not found" "$LINENO" 5
 fi
 
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for cwiid_open in -lcwiid" >&5
-$as_echo_n "checking for cwiid_open in -lcwiid... " >&6; }
-if test "${ac_cv_lib_cwiid_cwiid_open+set}" = set; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lcwiid  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char cwiid_open ();
-int
-main ()
-{
-return cwiid_open ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_cwiid_cwiid_open=yes
-else
-  ac_cv_lib_cwiid_cwiid_open=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_cwiid_cwiid_open" >&5
-$as_echo "$ac_cv_lib_cwiid_cwiid_open" >&6; }
-if test "x$ac_cv_lib_cwiid_cwiid_open" = x""yes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBCWIID 1
-_ACEOF
-
-  LIBS="-lcwiid $LIBS"
-
-else
-  as_fn_error $? "cwiid library not found" "$LINENO" 5
-fi
-
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for cos in -lm" >&5
+#AC_CHECK_LIB([cwiid], [cwiid_open],,
+#	AC_MSG_ERROR([cwiid library not found]))
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for cos in -lm" >&5
 $as_echo_n "checking for cos in -lm... " >&6; }
 if test "${ac_cv_lib_m_cos+set}" = set; then :
   $as_echo_n "(cached) " >&6
@@ -15014,18 +14955,6 @@ else
   as_fn_error $? "math library not found" "$LINENO" 5
 fi
 
-		;;
-	*)
-		 if true; then
-  TARGET_IS_PC_TRUE=
-  TARGET_IS_PC_FALSE='#'
-else
-  TARGET_IS_PC_TRUE='#'
-  TARGET_IS_PC_FALSE=
-fi
-
-		;;
-esac
 
 # Checks for header files.
 for ac_header in fcntl.h stddef.h stdint.h stdlib.h string.h sys/time.h termios.h unistd.h
@@ -15577,14 +15506,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepCXX_TRUE}" && test -z "${am__fastdepCXX_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCXX\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${TARGET_IS_PC_TRUE}" && test -z "${TARGET_IS_PC_FALSE}"; then
-  as_fn_error $? "conditional \"TARGET_IS_PC\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${TARGET_IS_PC_TRUE}" && test -z "${TARGET_IS_PC_FALSE}"; then
-  as_fn_error $? "conditional \"TARGET_IS_PC\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_GTK_TRUE}" && test -z "${HAVE_GTK_FALSE}"; then

@@ -5,4 +5,6 @@ src/config.status
 .deps
 src/libtool
 src/stamp-h1
+src/autom4te.cache/*
+
 

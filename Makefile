@@ -30,7 +30,6 @@ CONFIGURE_ARGS += \
 # directory in your OpenWrt SDK directory
 PKG_BUILD_DIR := $(BUILD_DIR)/$(PKG_NAME)
 
-
 include $(INCLUDE_DIR)/package.mk
 
 # Specify package information for this program. 
@@ -42,12 +41,13 @@ define Package/cwiimotecar
 	SECTION:=utils
 	CATEGORY:=Utilities
 	TITLE:=CWiid Test -- example project for Wiimote driver
+	DEPENDS+= +libcwiid
 endef
 
 
 # Uncomment portion below for Kamikaze and delete DESCRIPTION variable above
 define Package/cwiimotecar/description
-	Provides an OpenWRT wrapper for the CWiid wmdemo application.
+	Control a remote control car via a Nintendo Wiimote (R).
 endef
 
 

@@ -18,9 +18,6 @@
 /* Define to 1 if you have the `bluetooth' library (-lbluetooth). */
 #undef HAVE_LIBBLUETOOTH
 
-/* Define to 1 if you have the `cwiid' library (-lcwiid). */
-#undef HAVE_LIBCWIID
-
 /* Define to 1 if you have the `m' library (-lm). */
 #undef HAVE_LIBM
 

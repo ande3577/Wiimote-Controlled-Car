@@ -22,24 +22,14 @@ AC_PROG_MAKE_SET
 AC_PROG_LIBTOOL
 AC_CONFIG_MACRO_DIR([m4])
 
-case $target in
-	*-*-mipsel*)
-		AM_CONDITIONAL(TARGET_IS_PC,false)
-		# Checks for libraries.
-		# in OpenWRT this check will fail
-		AC_CHECK_LIB([pthread], [pthread_create],,
-			AC_MSG_ERROR([pthread library not found]))
-		AC_CHECK_LIB([bluetooth], [hci_devid],,
-			AC_MSG_ERROR([bluetooth library not found]))
-		AC_CHECK_LIB([cwiid], [cwiid_open],,
-			AC_MSG_ERROR([cwiid library not found]))
-		AC_CHECK_LIB([m], [cos],,
-			AC_MSG_ERROR([math library not found]))
-		;;
-	*)
-		AM_CONDITIONAL(TARGET_IS_PC,true)
-		;;
-esac
+AC_CHECK_LIB([pthread], [pthread_create],,
+	AC_MSG_ERROR([pthread library not found]))
+AC_CHECK_LIB([bluetooth], [hci_devid],,
+	AC_MSG_ERROR([bluetooth library not found]))
+#AC_CHECK_LIB([cwiid], [cwiid_open],,
+#	AC_MSG_ERROR([cwiid library not found]))
+AC_CHECK_LIB([m], [cos],,
+	AC_MSG_ERROR([math library not found]))
 
 # Checks for header files.
 AC_CHECK_HEADERS([fcntl.h stddef.h stdint.h stdlib.h string.h sys/time.h termios.h unistd.h])

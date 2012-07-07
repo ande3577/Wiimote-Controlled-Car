@@ -1,0 +1,43 @@
+= Wiimote Controlled Car =
+
+== Installation instructions ==
+
+Install the OpenWRT buildroot or SDK following the instructions located at: http://wiki.openwrt.org/about/toolchain
+
+Project must be located at:
+
+> <OpenWRT directory>/package/cwiimotecar
+
+Due to a bug in the cwiid project, replace the file located in:
+
+> <OpenWRT directory>/trunk/feeds/packages/utils/cwiid
+
+with the project located at:
+
+> git@github.com:ande3577/cwiid_openwrt.git
+
+From the root directory run
+
+> make menuconfig
+
+and select the cwiimote car package under the Utilities screen.
+
+Run the autogen_release.sh script in the src folder.
+
+Compile it by running
+
+> make package/cwiimotecar/compile
+	
+To download into router:
+
+> cd to <OpenWRT directory>/bin/brcm47xx/packages
+> ssh into router: ssh root@192.168.1.1
+> install package: ipkg install cwiimotecar_1_brcm47xx.ipk
+	
+== Usage instructions ==
+
+Run the cwiimotecar package on the router.
+
+Follow the command line prompts to connect the wiimote.
+
+
